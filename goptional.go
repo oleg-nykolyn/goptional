@@ -71,11 +71,42 @@ func Map[X, Y any](input *Optional[X], mapper func(X) Y) *Optional[Y] {
 	return Of(mapper(input.Get()))
 }
 
+func MapOr[X, Y any](input *Optional[X], mapper func(X) Y, other Y) *Optional[Y] {
+	if input.IsEmpty() {
+		return Of(other)
+	}
+	return Of(mapper(input.Get()))
+}
+
+func MapOrElse[X, Y any](input *Optional[X], mapper func(X) Y, supplier func() Y) *Optional[Y] {
+	if input.IsEmpty() {
+		return Of(supplier())
+	}
+	return Of(mapper(input.Get()))
+}
+
 func FlatMap[X, Y any](input *Optional[X], mapper func(X) *Optional[Y]) *Optional[Y] {
 	if input.IsEmpty() {
 		return Empty[Y]()
 	}
 	return mapper(input.Get())
+}
+
+func (o *Optional[T]) And(supplier func() *Optional[T]) *Optional[T] {
+	if o.IsEmpty() {
+		return o
+	}
+	return supplier()
+}
+
+func (o *Optional[T]) Xor(optional *Optional[T]) *Optional[T] {
+	if (o.IsEmpty() && optional.IsEmpty()) || (o.IsPresent() && optional.IsPresent()) {
+		return Empty[T]()
+	}
+	if o.IsPresent() {
+		return o
+	}
+	return optional
 }
 
 func (o *Optional[T]) Or(supplier func() *Optional[T]) *Optional[T] {
@@ -99,16 +130,9 @@ func (o *Optional[T]) OrElseGet(supplier func() T) T {
 	return supplier()
 }
 
-func (o *Optional[T]) OrElsePanic() T {
+func (o *Optional[T]) OrElsePanicWithErr(supplier func() error) T {
 	if o.IsEmpty() {
-		panic(noSuchElementErrMsg)
-	}
-	return o.Get()
-}
-
-func (o *Optional[T]) OrElsePanicWithErr(errSupplier func() error) T {
-	if o.IsEmpty() {
-		panic(errSupplier().Error())
+		panic(supplier().Error())
 	}
 	return o.Get()
 }
