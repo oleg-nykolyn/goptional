@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDoNothing_AlwaysValid(t *testing.T) {
-	DoNothing()
+func Test_AlwaysOk(t *testing.T) {
 	require.True(t, true)
 }
