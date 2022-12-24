@@ -73,7 +73,7 @@ func (o *Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
 	}
 }
 
-// Filter returns self if the Optional is empty or
+// Filter returns self if self is empty or
 // if the predicate applied to its value returns false.
 //
 // It panics if predicate is nil.
@@ -89,12 +89,12 @@ func (o *Optional[T]) Filter(predicate func(T) bool) *Optional[T] {
 
 // Map returns one of the following:
 //
-//   - input if the Optional is empty
-//   - a new Optional holding a value that results from the application of the given mapper to the input Optional value
+//   - input if input is empty
+//   - a new Optional holding a value that results from the application of the given mapper to the value of input
 //
 // It panics if one of these is true:
 //   - input is nil
-//   - mapper is nil and the input Optional is not empty
+//   - mapper is nil and input is not empty
 func Map[X, Y any](input *Optional[X], mapper func(X) Y) *Optional[Y] {
 	if input.IsEmpty() {
 		return Empty[Y]()
@@ -102,11 +102,11 @@ func Map[X, Y any](input *Optional[X], mapper func(X) Y) *Optional[Y] {
 	return Of(mapper(input.Get()))
 }
 
-// MapOr is similar to Map, but if the input Optional is empty, it returns a new Optional holding a default value instead.
+// MapOr is similar to Map, but if input is empty, it returns a new Optional holding a default value instead.
 //
 // It panics if one of these is true:
 //   - input is nil
-//   - mapper is nil and the input Optional is not empty
+//   - mapper is nil and input is not empty
 func MapOr[X, Y any](input *Optional[X], mapper func(X) Y, other Y) *Optional[Y] {
 	if input.IsEmpty() {
 		return Of(other)
@@ -114,12 +114,12 @@ func MapOr[X, Y any](input *Optional[X], mapper func(X) Y, other Y) *Optional[Y]
 	return Of(mapper(input.Get()))
 }
 
-// MapOrElse is similar to MapOr, but if the input Optional is empty, it returns a new Optional holding the value provided by the given supplier.
+// MapOrElse is similar to MapOr, but if input is empty, it returns a new Optional holding the value provided by the given supplier.
 //
 // It panics if one of these is true:
 //   - input is nil
-//   - supplier is nil and the input Optional is empty
-//   - mapper is nil and the input Optional is not empty
+//   - supplier is nil and input is empty
+//   - mapper is nil and input is not empty
 func MapOrElse[X, Y any](input *Optional[X], mapper func(X) Y, supplier func() Y) *Optional[Y] {
 	if input.IsEmpty() {
 		return Of(supplier())
@@ -129,12 +129,12 @@ func MapOrElse[X, Y any](input *Optional[X], mapper func(X) Y, supplier func() Y
 
 // FlatMap returns one of the following:
 //
-//   - an empty Optional if the input Optional is empty
-//   - a new Optional that results from applying the mapper to the input Optional value
+//   - an empty Optional if input is empty
+//   - a new Optional that results from the application of the given mapper to the value of input
 //
 // It panics if one of these is true:
 //   - input is nil
-//   - mapper is nil and the input Optional is not empty
+//   - mapper is nil and input is not empty
 func FlatMap[X, Y any](input *Optional[X], mapper func(X) *Optional[Y]) *Optional[Y] {
 	if input.IsEmpty() {
 		return Empty[Y]()
@@ -143,7 +143,7 @@ func FlatMap[X, Y any](input *Optional[X], mapper func(X) *Optional[Y]) *Optiona
 }
 
 // And returns one of the following:
-//   - self if the Optional is empty
+//   - self if self is empty
 //   - a new Optional provided by the given supplier
 //
 // It panics if the Optional is not empty and supplier is nil.
@@ -155,7 +155,7 @@ func (o *Optional[T]) And(supplier func() *Optional[T]) *Optional[T] {
 }
 
 // Or returns one of the following:
-//   - self if the Optional is not empty
+//   - self if self is not empty
 //   - a new Optional provided by the given supplier
 //
 // It panics if the Optional is not empty and supplier is nil.
