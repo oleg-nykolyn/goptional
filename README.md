@@ -26,7 +26,7 @@ Here are some ways you can contribute to the project:
 
 ---
 
-Released under [MIT license](LICENSE).
+Released under [MIT license](LICENSE.txt).
 
 [doc-img]: https://pkg.go.dev/badge/github.com/nykolynoleg/goptional
 [doc]: https://pkg.go.dev/github.com/nykolynoleg/goptional
