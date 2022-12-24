@@ -99,14 +99,14 @@ func (o *Optional[T]) And(supplier func() *Optional[T]) *Optional[T] {
 	return supplier()
 }
 
-func (o *Optional[T]) Xor(optional *Optional[T]) *Optional[T] {
-	if (o.IsEmpty() && optional.IsEmpty()) || (o.IsPresent() && optional.IsPresent()) {
+func (o *Optional[T]) Xor(o2 *Optional[T]) *Optional[T] {
+	if (o.IsEmpty() && o2.IsEmpty()) || (o.IsPresent() && o2.IsPresent()) {
 		return Empty[T]()
 	}
 	if o.IsPresent() {
 		return o
 	}
-	return optional
+	return o2
 }
 
 func (o *Optional[T]) Or(supplier func() *Optional[T]) *Optional[T] {
