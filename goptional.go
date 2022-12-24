@@ -20,7 +20,7 @@ func Empty[T any]() *Optional[T] {
 }
 
 // Of returns a new Optional that holds the given value.
-// If the given value is the zero value of its type, it returns an empty Optional instead.
+// If it is the zero value of its type, it returns an empty Optional instead.
 func Of[T any](value T) *Optional[T] {
 	if reflect.ValueOf(&value).Elem().IsZero() {
 		return Empty[T]()
@@ -30,18 +30,19 @@ func Of[T any](value T) *Optional[T] {
 	}
 }
 
-// IsPresent returns true if the Optional holds a value, and false if it is empty.
+// IsPresent returns true if the Optional holds a value, and false otherwise.
 func (o *Optional[T]) IsPresent() bool {
 	return o.wrappedValue != nil
 }
 
-// IsEmpty returns true if the Optional is empty, and false if it holds a value.
+// IsEmpty returns true if the Optional is empty, and false otherwise.
 func (o *Optional[T]) IsEmpty() bool {
 	return o.wrappedValue == nil
 }
 
-// Get returns the value held by the Optional instance.
-// If the instance is empty, it will cause a panic with the message "no value present".
+// Get returns the value held by the Optional.
+//
+// It panics if the Optional is empty.
 func (o *Optional[T]) Get() T {
 	if o.IsEmpty() {
 		panic(noSuchElementErrMsg)
@@ -49,17 +50,21 @@ func (o *Optional[T]) Get() T {
 	return o.wrappedValue.value
 }
 
-// IfPresent takes a function as input and calls it with the value held by the Optional instance if it holds a value.
-// If the Optional instance is empty, it does nothing.
+// IfPresent applies the action to the value held by the Optional.
+// Does nothing if the Optional is empty.
+//
+// It panics if action is nil and the Optional is not empty.
 func (o *Optional[T]) IfPresent(action func(T)) {
 	if o.IsPresent() {
 		action(o.Get())
 	}
 }
 
-// IfPresentOrElse takes a function and an "empty action" function as input.
-// It calls the first function with the value held by the Optional instance if it holds a value,
-// or the "empty action" function if it is empty.
+// IfPresentOrElse applies the action to the value held by the Optional or calls emptyAction if the Optional is empty.
+//
+// It panics if one of these is true:
+//   - action is nil and the Optional is not empty
+//   - emptyAction is nil and the Optional is empty
 func (o *Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
 	if o.IsPresent() {
 		action(o.Get())
@@ -68,8 +73,10 @@ func (o *Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
 	}
 }
 
-// Filter returns a new Optional instance holding the value of the original instance if it holds a value and the value satisfies the given predicate.
-// If the original instance is empty or the value does not satisfy the predicate, it returns an empty Optional instance.
+// Filter returns an empty Optional if the source Optional is empty or
+// if the predicate applied to its value returns false.
+//
+// It panics if predicate is nil.
 func (o *Optional[T]) Filter(predicate func(T) bool) *Optional[T] {
 	if o.IsEmpty() {
 		return o
@@ -80,9 +87,14 @@ func (o *Optional[T]) Filter(predicate func(T) bool) *Optional[T] {
 	return Empty[T]()
 }
 
-// Map takes an Optional instance and a function as input,
-// and returns a new Optional instance holding the result of applying the function to the value held by the input instance (if it holds a value).
-// If the input instance is empty, it returns an empty Optional instance.
+// Map returns one of the following:
+//
+//   - An empty Optional if the input Optional is empty
+//   - A new Optional holding a value that results from the application of the given mapper to the input Optional value
+//
+// It panics if one of these is true:
+//   - input is nil
+//   - mapper is nil and the input Optional is not empty
 func Map[X, Y any](input *Optional[X], mapper func(X) Y) *Optional[Y] {
 	if input.IsEmpty() {
 		return Empty[Y]()
@@ -90,7 +102,11 @@ func Map[X, Y any](input *Optional[X], mapper func(X) Y) *Optional[Y] {
 	return Of(mapper(input.Get()))
 }
 
-// MapOr is similar to Map, but if the input Optional instance is empty, it returns a new Optional instance holding a default value instead.
+// MapOr is similar to Map, but if the input Optional is empty, it returns a new Optional holding a default value instead.
+//
+// It panics if one of these is true:
+//   - input is nil
+//   - mapper is nil and the input Optional is not empty
 func MapOr[X, Y any](input *Optional[X], mapper func(X) Y, other Y) *Optional[Y] {
 	if input.IsEmpty() {
 		return Of(other)
@@ -98,7 +114,12 @@ func MapOr[X, Y any](input *Optional[X], mapper func(X) Y, other Y) *Optional[Y]
 	return Of(mapper(input.Get()))
 }
 
-// MapOrElse is similar to MapOr, but allows you to specify a function to supply the default value to use if the input Optional instance is empty.
+// MapOrElse is similar to MapOr, but if the input Optional is empty, it returns a new Optional holding the value provided by the given supplier.
+//
+// It panics if one of these is true:
+//   - input is nil
+//   - supplier is nil and the input Optional is empty
+//   - mapper is nil and the input Optional is not empty
 func MapOrElse[X, Y any](input *Optional[X], mapper func(X) Y, supplier func() Y) *Optional[Y] {
 	if input.IsEmpty() {
 		return Of(supplier())
@@ -106,11 +127,14 @@ func MapOrElse[X, Y any](input *Optional[X], mapper func(X) Y, supplier func() Y
 	return Of(mapper(input.Get()))
 }
 
-// FlatMap is similar to Map, but allows the function it takes as input to return an Optional instance.
-// If the input Optional instance is empty, it returns an empty Optional instance.
-// If the input Optional instance holds a value and the function returns an Optional instance that holds a value,
-// the returned Optional instance holds the value returned by the function.
-// If the input Optional instance holds a value but the function returns an empty Optional instance, the returned Optional instance is also empty.
+// FlatMap returns one of the following:
+//
+//   - An empty Optional if the input Optional is empty
+//   - A new Optional that results from applying the mapper on the input Optional value
+//
+// It panics if one of these is true:
+//   - input is nil
+//   - mapper is nil and the input Optional is not empty
 func FlatMap[X, Y any](input *Optional[X], mapper func(X) *Optional[Y]) *Optional[Y] {
 	if input.IsEmpty() {
 		return Empty[Y]()
