@@ -3,7 +3,7 @@ package goptional
 import "reflect"
 
 // Optional represents an optional value.
-// Every Optional is either populated or empty.
+// Every Optional is either populated with a value or empty.
 type Optional[T any] struct {
 	wrappedValue *valueWrapper[T]
 }
