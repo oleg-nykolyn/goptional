@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Lint
-        run: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v3
 
       - name: Test
         run: go test ./... -race -coverprofile=coverage.txt -covermode=atomic
