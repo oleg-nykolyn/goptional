@@ -106,9 +106,9 @@ func (o *Optional[T]) OrElsePanic() T {
 	return o.Get()
 }
 
-func (o *Optional[T]) OrElsePanicWithErr(f func() error) T {
+func (o *Optional[T]) OrElsePanicWithErr(errSupplier func() error) T {
 	if o.IsEmpty() {
-		panic(f().Error())
+		panic(errSupplier().Error())
 	}
 	return o.Get()
 }
