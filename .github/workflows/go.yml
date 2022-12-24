@@ -29,6 +29,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Lint
+        run: golangci/golangci-lint-action@v3
+
       - uses: actions/cache@v3
         with:
           path: |
@@ -37,9 +40,6 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-
-      - name: Lint
-        run: golangci-lint run
 
       - name: Test
         run: go test ./... -race -coverprofile=coverage.txt -covermode=atomic
