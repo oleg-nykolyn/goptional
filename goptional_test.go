@@ -8,6 +8,5 @@ import (
 
 func TestDoNothing_AlwaysValid(t *testing.T) {
 	DoNothing()
-
 	require.True(t, true)
 }
