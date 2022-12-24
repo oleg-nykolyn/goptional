@@ -3,6 +3,7 @@ package goptional
 import "reflect"
 
 // Optional represents an optional value.
+// Every Optional is either populated or empty.
 type Optional[T any] struct {
 	wrappedValue *valueWrapper[T]
 }
@@ -13,13 +14,13 @@ type valueWrapper[T any] struct {
 
 const noSuchElementErrMsg = "no value present"
 
-// Empty returns a new Optional instance that does not hold a value.
+// Empty returns a new empty Optional.
 func Empty[T any]() *Optional[T] {
 	return &Optional[T]{}
 }
 
-// Of returns a new Optional instance that holds a value.
-// If the value passed to it is the zero value of its type, it returns an empty Optional instance instead.
+// Of returns a new Optional that holds the given value.
+// If the given value is the zero value of its type, it returns an empty Optional instead.
 func Of[T any](value T) *Optional[T] {
 	if reflect.ValueOf(&value).Elem().IsZero() {
 		return Empty[T]()
@@ -29,12 +30,12 @@ func Of[T any](value T) *Optional[T] {
 	}
 }
 
-// IsPresent returns true if the Optional instance holds a value, and false if it is empty.
+// IsPresent returns true if the Optional holds a value, and false if it is empty.
 func (o *Optional[T]) IsPresent() bool {
 	return o.wrappedValue != nil
 }
 
-// IsEmpty returns true if the Optional instance is empty, and false if it holds a value.
+// IsEmpty returns true if the Optional is empty, and false if it holds a value.
 func (o *Optional[T]) IsEmpty() bool {
 	return o.wrappedValue == nil
 }
@@ -117,8 +118,8 @@ func FlatMap[X, Y any](input *Optional[X], mapper func(X) *Optional[Y]) *Optiona
 	return mapper(input.Get())
 }
 
-// And returns an empty Optional if the original Optional is empty, otherwise it returns the Optional returned by the provided supplier.
-// It panics if the provided supplier is nil.
+// And returns an empty Optional if the original Optional is empty, otherwise it returns the Optional returned by the given supplier.
+// It panics if the given supplier is nil.
 func (o *Optional[T]) And(supplier func() *Optional[T]) *Optional[T] {
 	if o.IsEmpty() {
 		return o
