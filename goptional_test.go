@@ -8,5 +8,4 @@ import (
 
 func Test_AlwaysOk(t *testing.T) {
 	require.True(t, true)
-
 }
