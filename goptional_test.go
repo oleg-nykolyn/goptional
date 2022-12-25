@@ -504,3 +504,107 @@ func TestMapOrElse_NilSupplierOnEmpty(t *testing.T) {
 	}()
 	MapOrElse(Empty[string](), func(x string) int { return 0 }, nil)
 }
+
+func TestFlatMap_Empty(t *testing.T) {
+	opt := FlatMap(Empty[string](), func(x string) *Optional[int] { return Of(123) })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFlatMap_NilMapperOnEmpty(t *testing.T) {
+	opt := FlatMap[string, interface{}](Empty[string](), nil)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFlatMap_MapToNotEmptyOnNotEmpty(t *testing.T) {
+	opt := FlatMap(Of(123), func(x int) *Optional[string] { return Of(fmt.Sprintf("%v", x)) })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "123")
+}
+
+func TestFlatMap_MapToEmptyOnNotEmpty(t *testing.T) {
+	opt := FlatMap(Of(123), func(x int) *Optional[string] { return Empty[string]() })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFlatMap_NilMapperOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	FlatMap[int, string](Of(123), nil)
+}
+
+func TestFlatMap_NilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	FlatMap(nil, func(x int) *Optional[string] { return Of("123") })
+}
+
+func TestFlatMap_NilMapperOnNilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	FlatMap[bool, bool](nil, nil)
+}
+
+func TestAnd_Empty(t *testing.T) {
+	require.True(t, Empty[string]().And(func() *Optional[string] { return Of("123") }).IsEmpty())
+}
+
+func TestAnd_NilSupplierOnEmpty(t *testing.T) {
+	require.True(t, Empty[string]().And(nil).IsEmpty())
+}
+
+func TestAnd_SuppliedEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.And(func() *Optional[int] { return Empty[int]() })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestAnd_SuppliedNotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.And(func() *Optional[int] { return Of(321) })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), 321)
+}
+
+func TestAnd_NilSupplierOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of(123).And(nil)
+}
+
+func TestOr_NilSupplierOnNotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.Or(nil)
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), 123)
+}
+
+func TestOr_NotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.Or(func() *Optional[int] { return Of(321) })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), 123)
+}
+
+func TestOr_SuppliedNotEmptyOnEmpty(t *testing.T) {
+	opt := Empty[string]()
+	opt = opt.Or(func() *Optional[string] { return Of("123") })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "123")
+}
+
+func TestOr_SuppliedEmptyOnEmpty(t *testing.T) {
+	opt := Empty[string]()
+	opt = opt.Or(func() *Optional[string] { return Empty[string]() })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestOr_NilSupplierOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Empty[string]().Or(nil)
+}
