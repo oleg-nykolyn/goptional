@@ -1,6 +1,7 @@
 package goptional
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -634,4 +635,43 @@ func TestOrElseGet_NilSupplierOnEmpty(t *testing.T) {
 		require.NotNil(t, recover())
 	}()
 	Empty[string]().OrElseGet(nil)
+}
+
+func TestOrElsePanic_NotEmpty(t *testing.T) {
+	require.EqualValues(t, Of(123).OrElsePanic(func() error { return errors.New("woops") }), 123)
+}
+
+func TestOrElsePanic_NilSupplierOnNotEmpty(t *testing.T) {
+	require.EqualValues(t, Of(123).OrElsePanic(nil), 123)
+}
+
+func TestOrElsePanic_Empty(t *testing.T) {
+	defer func() {
+		r := recover()
+		require.NotNil(t, r)
+		err, ok := r.(error)
+		require.True(t, ok)
+		require.Error(t, err)
+		require.EqualError(t, err, "woops")
+	}()
+	Empty[string]().OrElsePanic(func() error { return errors.New("woops") })
+}
+
+func TestOrElsePanic_SuppliedNilOnEmpty(t *testing.T) {
+	defer func() {
+		r := recover()
+		require.NotNil(t, r)
+		err, ok := r.(error)
+		require.True(t, ok)
+		require.Error(t, err)
+		require.EqualError(t, err, noValueErrMsg)
+	}()
+	Empty[string]().OrElsePanic(func() error { return nil })
+}
+
+func TestOrElsePanic_NilSupplierOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Empty[string]().OrElsePanic(nil)
 }
