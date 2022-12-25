@@ -32,13 +32,22 @@ func Empty[T any]() Optional[T] {
 }
 
 // Of returns a new Optional that holds the given value.
-// If it is the zero value of its type, it returns an empty Optional instead.
-func Of[T any](value T) Optional[T] {
-	if reflect.ValueOf(&value).Elem().IsZero() {
-		return Empty[T]()
+// If value is nil, it returns an empty Optional instead.
+func Of[T any](value T) (opt Optional[T]) {
+	v := reflect.ValueOf(value)
+	if !v.IsValid() {
+		return
 	}
-	return Optional[T]{
-		wrappedValue: &valueWrapper[T]{value: value},
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
+		if v.IsNil() {
+			return
+		}
+		fallthrough
+	default:
+		return Optional[T]{
+			wrappedValue: &valueWrapper[T]{value: value},
+		}
 	}
 }
 
