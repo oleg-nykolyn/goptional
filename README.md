@@ -2,7 +2,7 @@
 
 [![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
 
-A generics-based implementation of the `Optional` type in Go 🚀
+The definitive implementation of the `Optional` type in Go 🚀
 
 ## Features
 
@@ -18,7 +18,7 @@ A generics-based implementation of the `Optional` type in Go 🚀
 go get -u github.com/nykolynoleg/goptional
 ```
 
-## Examples
+## Usage
 
 > 👨🏻‍💻 Refer to the [documentation](https://pkg.go.dev/github.com/nykolynoleg/goptional) for a complete reference.
 
@@ -34,21 +34,21 @@ import "github.com/nykolynoleg/goptional"
 intOpt := goptional.Of(123)
 
 // Creates an empty Optional of type string.
-strOpt := goptional.Empty[string]()
+strEmptyOpt := goptional.Empty[string]()
 
 // 'Of' returns an empty Optional if its argument is nil.
 strSliceOpt := goptional.Of[[]string](nil)
 
 // Note that if Of's argument is the zero value of a value type,
-// such as ("", false, 0) then a non-empty Optional is returned.
-emptyStrOpt := goptional.Of("")
+// such as "", false, 0 then a non-empty Optional is returned.
+strOpt := goptional.Of("")
 ```
 
 ### Inspection
 
 ```go
 strOpt := goptional.Of("hello goptional")
-intOpt := goptional.Empty[int]()
+intEmptyOpt := goptional.Empty[int]()
 
 // Returns true if Optional holds a value.
 if strOpt.IsPresent() {
@@ -56,7 +56,7 @@ if strOpt.IsPresent() {
 }
 
 // Returns true if Optional is empty.
-if intOpt.IsEmpty() {
+if intEmptyOpt.IsEmpty() {
     // ...
 }
 
@@ -91,8 +91,6 @@ if goptional.Of(123).IsPresent() {
 ```
 
 ## Testing
-
-Without coverage:
 
 ```bash
 go test ./... -v
