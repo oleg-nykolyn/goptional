@@ -153,8 +153,8 @@ func TestOf_NilValues(t *testing.T) {
 	optPtr := Of[*string](nil)
 	require.Nil(t, optPtr.wrappedValue)
 
-	optIface := Of[interface{}](nil)
-	require.Nil(t, optIface.wrappedValue)
+	optIFace := Of[interface{}](nil)
+	require.Nil(t, optIFace.wrappedValue)
 
 	optSlice := Of[[]string](nil)
 	require.Nil(t, optSlice.wrappedValue)
