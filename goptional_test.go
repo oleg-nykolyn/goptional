@@ -198,3 +198,43 @@ func TestOf_NilPointer(t *testing.T) {
 	optPtr := Of[*string](nil)
 	require.Nil(t, optPtr.wrappedValue)
 }
+
+func TestIsPresent_Empty(t *testing.T) {
+	opt := Empty[string]()
+	require.False(t, opt.IsPresent())
+}
+
+func TestIsPresent_NilValue(t *testing.T) {
+	opt := Of[map[string]interface{}](nil)
+	require.False(t, opt.IsPresent())
+}
+
+func TestIsPresent_NonZeroValue(t *testing.T) {
+	opt := Of("goptional")
+	require.True(t, opt.IsPresent())
+}
+
+func TestIsPresent_ZeroValue(t *testing.T) {
+	opt := Of("")
+	require.True(t, opt.IsPresent())
+}
+
+func TestIsEmpty_Empty(t *testing.T) {
+	opt := Empty[string]()
+	require.True(t, opt.IsEmpty())
+}
+
+func TestIsEmpty_NilValue(t *testing.T) {
+	opt := Of[map[string]interface{}](nil)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestIsEmpty_NonZeroValue(t *testing.T) {
+	opt := Of("goptional")
+	require.False(t, opt.IsEmpty())
+}
+
+func TestIsEmpty_ZeroValue(t *testing.T) {
+	opt := Of("")
+	require.False(t, opt.IsEmpty())
+}
