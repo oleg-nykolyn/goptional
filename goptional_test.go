@@ -574,3 +574,37 @@ func TestAnd_NilSupplierOnNotEmpty(t *testing.T) {
 	}()
 	Of(123).And(nil)
 }
+
+func TestOr_NilSupplierOnNotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.Or(nil)
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), 123)
+}
+
+func TestOr_NotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.Or(func() *Optional[int] { return Of(321) })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), 123)
+}
+
+func TestOr_SuppliedNotEmptyOnEmpty(t *testing.T) {
+	opt := Empty[string]()
+	opt = opt.Or(func() *Optional[string] { return Of("123") })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "123")
+}
+
+func TestOr_SuppliedEmptyOnEmpty(t *testing.T) {
+	opt := Empty[string]()
+	opt = opt.Or(func() *Optional[string] { return Empty[string]() })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestOr_NilSupplierOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Empty[string]().Or(nil)
+}
