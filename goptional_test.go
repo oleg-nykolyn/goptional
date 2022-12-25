@@ -616,3 +616,22 @@ func TestOrElse_NotEmpty(t *testing.T) {
 func TestOrElse_Empty(t *testing.T) {
 	require.EqualValues(t, Empty[int]().OrElse(123), 123)
 }
+
+func TestOrElseGet_NotEmpty(t *testing.T) {
+	require.EqualValues(t, Of(123).OrElseGet(func() int { return 321 }), 123)
+}
+
+func TestOrElseGet_NilSupplierOnNotEmpty(t *testing.T) {
+	require.EqualValues(t, Of(123).OrElseGet(nil), 123)
+}
+
+func TestOrElseGet_Empty(t *testing.T) {
+	require.EqualValues(t, Empty[int]().OrElseGet(func() int { return 321 }), 321)
+}
+
+func TestOrElseGet_NilSupplierOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Empty[string]().OrElseGet(nil)
+}
