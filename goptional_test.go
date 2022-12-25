@@ -608,3 +608,11 @@ func TestOr_NilSupplierOnEmpty(t *testing.T) {
 	}()
 	Empty[string]().Or(nil)
 }
+
+func TestOrElse_NotEmpty(t *testing.T) {
+	require.EqualValues(t, Of(123).OrElse(321), 123)
+}
+
+func TestOrElse_Empty(t *testing.T) {
+	require.EqualValues(t, Empty[int]().OrElse(123), 123)
+}
