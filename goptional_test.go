@@ -1,6 +1,7 @@
 package goptional
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -380,4 +381,41 @@ func TestFilter_PredicateNotOkOnNotEmpty(t *testing.T) {
 	opt := Of(123)
 	opt = opt.Filter(func(_ int) bool { return false })
 	require.True(t, opt.IsEmpty())
+}
+
+func TestMap_Empty(t *testing.T) {
+	opt := Map(Empty[string](), func(s string) string { return s })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestMap_NilMapperOnEmpty(t *testing.T) {
+	opt := Map[string, interface{}](Empty[string](), nil)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestMap_NotEmpty(t *testing.T) {
+	opt := Map(Of(123), func(x int) string { return fmt.Sprintf("%v", x) })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "123")
+}
+
+func TestMap_NilMapperOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Map[int, string](Of(123), nil)
+}
+
+func TestMap_NilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Map(nil, func(i int) string { return "goptional" })
+}
+
+func TestMap_NilMapperOnNilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Map[bool, bool](nil, nil)
 }
