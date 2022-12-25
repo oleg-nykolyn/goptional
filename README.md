@@ -27,6 +27,69 @@ go get -u github.com/nykolynoleg/goptional
 import "github.com/nykolynoleg/goptional"
 ```
 
+### Creation
+
+```go
+// Creates an Optional that holds an int value.
+intOpt := goptional.Of(123)
+
+// Creates an empty Optional of type string.
+strOpt := goptional.Empty[string]()
+
+// 'Of' returns an empty Optional if its argument is nil.
+strSliceOpt := goptional.Of[[]string](nil)
+
+// Note that if Of's argument is the zero value of a value type, such as ("", false, 0),
+// a non-empty Optional is returned.
+emptyStrOpt := goptional.Of("")
+```
+
+### Inspection
+
+```go
+strOpt := goptional.Of("hello goptional")
+intOpt := goptional.Empty[int]()
+
+// Returns true if Optional holds a value.
+if strOpt.IsPresent() {
+    // ...
+}
+
+// Returns true if Optional is empty.
+if intOpt.IsEmpty() {
+    // ...
+}
+
+// Method chaining is supported.
+if goptional.Of(123).IsPresent() {
+    // ...
+}
+```
+
+### Retrieval
+
+```go
+// TODO
+```
+
+### Filtering
+
+```go
+// TODO
+```
+
+### Mapping
+
+```go
+// TODO
+```
+
+### Peeking
+
+```go
+// TODO
+```
+
 ## Testing
 
 Without coverage:
