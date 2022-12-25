@@ -262,4 +262,33 @@ func TestGet_NilValue(t *testing.T) {
 }
 
 func TestIfPresent_NotEmpty(t *testing.T) {
+	optVal := 0
+	Of(123).IfPresent(func(x int) { optVal = x })
+	require.EqualValues(t, optVal, 123)
+}
+
+func TestIfPresent_Empty(t *testing.T) {
+	called := false
+	Empty[int]().IfPresent(func(_ int) { called = true })
+	require.False(t, called)
+}
+
+func TestIfPresent_NilValue(t *testing.T) {
+	called := false
+	Of[[]string](nil).IfPresent(func(_ []string) { called = true })
+	require.False(t, called)
+}
+
+func TestIfPresent_NilActionOnEmpty(t *testing.T) {
+	defer func() {
+		require.Nil(t, recover())
+	}()
+	Of[[]string](nil).IfPresent(nil)
+}
+
+func TestIfPresent_NilActionOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of([]string{"a", "b", "c"}).IfPresent(nil)
 }
