@@ -1,6 +1,7 @@
 package goptional
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -291,4 +292,215 @@ func TestIfPresent_NilActionOnNotEmpty(t *testing.T) {
 		require.NotNil(t, recover())
 	}()
 	Of([]string{"a", "b", "c"}).IfPresent(nil)
+}
+
+func TestIfPresentOrElse_Empty(t *testing.T) {
+	var actionCalled, emptyActionCalled bool
+	Empty[string]().IfPresentOrElse(func(_ string) { actionCalled = true }, func() { emptyActionCalled = true })
+	require.False(t, actionCalled)
+	require.True(t, emptyActionCalled)
+}
+
+func TestIfPresentOrElse_NilValue(t *testing.T) {
+	var actionCalled, emptyActionCalled bool
+	Of[*string](nil).IfPresentOrElse(func(_ *string) { actionCalled = true }, func() { emptyActionCalled = true })
+	require.False(t, actionCalled)
+	require.True(t, emptyActionCalled)
+}
+
+func TestIfPresentOrElse_NotEmpty(t *testing.T) {
+	var actionCalled, emptyActionCalled bool
+	Of(123).IfPresentOrElse(func(_ int) { actionCalled = true }, func() { emptyActionCalled = true })
+	require.True(t, actionCalled)
+	require.False(t, emptyActionCalled)
+}
+
+func TestIfPresentOrElse_NilActionOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of(123).IfPresentOrElse(nil, func() {})
+}
+
+func TestIfPresentOrElse_NilEmptyActionOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Empty[string]().IfPresentOrElse(func(_ string) {}, nil)
+}
+
+func TestIfPresentOrElse_NilEmptyActionOnNilValue(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of[*string](nil).IfPresentOrElse(func(_ *string) {}, nil)
+}
+
+func TestFilter_Empty(t *testing.T) {
+	opt := Empty[string]()
+	opt = opt.Filter(func(_ string) bool { return true })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFilter_NilValue(t *testing.T) {
+	opt := Of[[]string](nil)
+	opt = opt.Filter(func(_ []string) bool { return true })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFilter_NotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.Filter(func(_ int) bool { return true })
+	require.True(t, opt.IsPresent())
+}
+
+func TestFilter_NilPredicateOnEmpty(t *testing.T) {
+	require.True(t, Empty[string]().Filter(nil).IsEmpty())
+}
+
+func TestFilter_NilPredicateOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of(123).Filter(nil)
+}
+
+func TestFilter_PredicateNotOkOnEmpty(t *testing.T) {
+	opt := Empty[string]()
+	opt = opt.Filter(func(_ string) bool { return false })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFilter_PredicateNotOkOnNilValue(t *testing.T) {
+	opt := Of[*string](nil)
+	opt = opt.Filter(func(_ *string) bool { return false })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFilter_PredicateNotOkOnNotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.Filter(func(_ int) bool { return false })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestMap_Empty(t *testing.T) {
+	opt := Map(Empty[string](), func(s string) string { return s })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestMap_NilMapperOnEmpty(t *testing.T) {
+	opt := Map[string, interface{}](Empty[string](), nil)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestMap_NotEmpty(t *testing.T) {
+	opt := Map(Of(123), func(x int) string { return fmt.Sprintf("%v", x) })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "123")
+}
+
+func TestMap_NilMapperOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Map[int, string](Of(123), nil)
+}
+
+func TestMap_NilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Map(nil, func(i int) string { return "goptional" })
+}
+
+func TestMap_NilMapperOnNilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Map[bool, bool](nil, nil)
+}
+
+func TestMapOr_Empty(t *testing.T) {
+	opt := MapOr(Empty[string](), func(s string) string { return s }, "default")
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "default")
+}
+
+func TestMapOr_NilMapperOnEmpty(t *testing.T) {
+	opt := MapOr[string, interface{}](Empty[string](), nil, "default")
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "default")
+}
+
+func TestMapOr_NotEmpty(t *testing.T) {
+	opt := MapOr(Of(123), func(x int) string { return fmt.Sprintf("%v", x) }, "default")
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "123")
+}
+
+func TestMapOr_NilMapperOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOr(Of(123), nil, "default")
+}
+
+func TestMapOr_NilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOr(nil, func(i int) string { return "goptional" }, "default")
+}
+
+func TestMapOr_NilMapperOnNilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOr[bool](nil, nil, "default")
+}
+
+func TestMapOrElse_Empty(t *testing.T) {
+	opt := MapOrElse(Empty[string](), func(s string) string { return s }, func() string { return "default" })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "default")
+}
+
+func TestMapOrElse_NilMapperOnEmpty(t *testing.T) {
+	opt := MapOrElse(Empty[string](), nil, func() string { return "default" })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "default")
+}
+
+func TestMapOrElse_NotEmpty(t *testing.T) {
+	opt := MapOrElse(Of(123), func(x int) string { return fmt.Sprintf("%v", x) }, func() string { return "default" })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "123")
+}
+
+func TestMapOrElse_NilMapperOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOrElse(Of(123), nil, func() string { return "default" })
+}
+
+func TestMapOrElse_NilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOrElse(nil, func(i int) string { return "goptional" }, func() string { return "default" })
+}
+
+func TestMapOrElse_NilMapperOnNilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOrElse[bool](nil, nil, func() string { return "default" })
+}
+
+func TestMapOrElse_NilSupplierOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOrElse(Empty[string](), func(x string) int { return 0 }, nil)
 }

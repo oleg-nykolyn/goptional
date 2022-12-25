@@ -95,7 +95,7 @@ func (o *Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
 // Filter returns self if self is empty or
 // if the predicate applied to its value returns false.
 //
-// It panics if predicate is nil.
+// It panics if predicate is nil and the Optional is not empty.
 func (o *Optional[T]) Filter(predicate func(T) bool) *Optional[T] {
 	if o.IsEmpty() || predicate(o.Get()) {
 		return o
