@@ -39,7 +39,7 @@ strEmptyOpt := goptional.Empty[string]()
 // 'Of' returns an empty Optional if its argument is nil.
 strSliceOpt := goptional.Of[[]string](nil)
 
-// Note that if Of's argument is the zero value of a value type,
+// Note that if the argument is the zero value of a value type,
 // such as "", false, 0 then a non-empty Optional is returned.
 strOpt := goptional.Of("")
 ```
