@@ -12,7 +12,7 @@ A generics-based implementation of the `Optional` type in Go 🚀
 
 ## Installation
 
-> *goptional* requires **go 1.19**
+> ❗️ *goptional* requires **go 1.19**
 
 ```bash
 go get -u github.com/nykolynoleg/goptional
@@ -20,7 +20,7 @@ go get -u github.com/nykolynoleg/goptional
 
 ## Examples
 
-> Refer to the [documentation](https://pkg.go.dev/github.com/nykolynoleg/goptional) for a complete reference.
+> 👨🏻‍💻 Refer to the [documentation](https://pkg.go.dev/github.com/nykolynoleg/goptional) for a complete reference.
 
 ```go
 // Import goptional into your code and refer to it as `goptional`.
