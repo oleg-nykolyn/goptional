@@ -458,3 +458,49 @@ func TestMapOr_NilMapperOnNilInput(t *testing.T) {
 	}()
 	MapOr[bool](nil, nil, "default")
 }
+
+func TestMapOrElse_Empty(t *testing.T) {
+	opt := MapOrElse(Empty[string](), func(s string) string { return s }, func() string { return "default" })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "default")
+}
+
+func TestMapOrElse_NilMapperOnEmpty(t *testing.T) {
+	opt := MapOrElse(Empty[string](), nil, func() string { return "default" })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "default")
+}
+
+func TestMapOrElse_NotEmpty(t *testing.T) {
+	opt := MapOrElse(Of(123), func(x int) string { return fmt.Sprintf("%v", x) }, func() string { return "default" })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "123")
+}
+
+func TestMapOrElse_NilMapperOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOrElse(Of(123), nil, func() string { return "default" })
+}
+
+func TestMapOrElse_NilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOrElse(nil, func(i int) string { return "goptional" }, func() string { return "default" })
+}
+
+func TestMapOrElse_NilMapperOnNilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOrElse[bool](nil, nil, func() string { return "default" })
+}
+
+func TestMapOrElse_NilSupplierOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	MapOrElse(Empty[string](), func(x string) int { return 0 }, nil)
+}
