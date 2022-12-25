@@ -151,7 +151,7 @@ func MapOrElse[X, Y any](input *Optional[X], mapper func(X) Y, supplier func() Y
 // It panics if one of these is true:
 //   - input is nil
 //   - mapper is nil and input is not empty.
-func FlatMap[X, Y any](input Optional[X], mapper func(X) *Optional[Y]) *Optional[Y] {
+func FlatMap[X, Y any](input *Optional[X], mapper func(X) *Optional[Y]) *Optional[Y] {
 	if input.IsEmpty() {
 		return Empty[Y]()
 	}

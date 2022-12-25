@@ -504,3 +504,45 @@ func TestMapOrElse_NilSupplierOnEmpty(t *testing.T) {
 	}()
 	MapOrElse(Empty[string](), func(x string) int { return 0 }, nil)
 }
+
+func TestFlatMap_Empty(t *testing.T) {
+	opt := FlatMap(Empty[string](), func(x string) *Optional[int] { return Of(123) })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFlatMap_NilMapperOnEmpty(t *testing.T) {
+	opt := FlatMap[string, interface{}](Empty[string](), nil)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFlatMap_MapToNotEmptyOnNotEmpty(t *testing.T) {
+	opt := FlatMap(Of(123), func(x int) *Optional[string] { return Of(fmt.Sprintf("%v", x)) })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), "123")
+}
+
+func TestFlatMap_MapToEmptyOnNotEmpty(t *testing.T) {
+	opt := FlatMap(Of(123), func(x int) *Optional[string] { return Empty[string]() })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFlatMap_NilMapperOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	FlatMap[int, string](Of(123), nil)
+}
+
+func TestFlatMap_NilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	FlatMap(nil, func(x int) *Optional[string] { return Of("123") })
+}
+
+func TestFlatMap_NilMapperOnNilInput(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	FlatMap[bool, bool](nil, nil)
+}
