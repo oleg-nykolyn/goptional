@@ -86,6 +86,13 @@ func TestOf_NonZeroValues(t *testing.T) {
 	optCh := Of(ch)
 	require.NotNil(t, optCh.wrappedValue)
 	require.EqualValues(t, optCh.wrappedValue.value, ch)
+
+	// interface
+
+	var iFace interface{} = []string{str}
+	optIFace := Of(iFace)
+	require.NotNil(t, optIFace.wrappedValue)
+	require.EqualValues(t, optIFace.wrappedValue.value, iFace)
 }
 
 func TestOf_ZeroValues(t *testing.T) {
