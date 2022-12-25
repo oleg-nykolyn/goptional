@@ -334,3 +334,50 @@ func TestIfPresentOrElse_NilEmptyActionOnNilValue(t *testing.T) {
 	}()
 	Of[*string](nil).IfPresentOrElse(func(_ *string) {}, nil)
 }
+
+func TestFilter_Empty(t *testing.T) {
+	opt := Empty[string]()
+	opt = opt.Filter(func(_ string) bool { return true })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFilter_NilValue(t *testing.T) {
+	opt := Of[[]string](nil)
+	opt = opt.Filter(func(_ []string) bool { return true })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFilter_NotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.Filter(func(_ int) bool { return true })
+	require.True(t, opt.IsPresent())
+}
+
+func TestFilter_NilPredicateOnEmpty(t *testing.T) {
+	require.True(t, Empty[string]().Filter(nil).IsEmpty())
+}
+
+func TestFilter_NilPredicateOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of(123).Filter(nil)
+}
+
+func TestFilter_PredicateNotOkOnEmpty(t *testing.T) {
+	opt := Empty[string]()
+	opt = opt.Filter(func(_ string) bool { return false })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFilter_PredicateNotOkOnNilValue(t *testing.T) {
+	opt := Of[*string](nil)
+	opt = opt.Filter(func(_ *string) bool { return false })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestFilter_PredicateNotOkOnNotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.Filter(func(_ int) bool { return false })
+	require.True(t, opt.IsEmpty())
+}
