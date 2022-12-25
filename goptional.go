@@ -174,7 +174,7 @@ func (o *Optional[T]) And(supplier func() *Optional[T]) *Optional[T] {
 //   - self if self is not empty
 //   - a new Optional provided by the given supplier
 //
-// It panics if the Optional is not empty and supplier is nil.
+// It panics if the Optional is empty and supplier is nil.
 func (o *Optional[T]) Or(supplier func() *Optional[T]) *Optional[T] {
 	if o.IsPresent() {
 		return o
