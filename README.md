@@ -6,8 +6,25 @@ A generics-based implementation of the `Optional` type in Go 🚀
 
 ## Installation
 
+> *goptional* requires **go 1.19**
+
 ```bash
 go get -u github.com/nykolynoleg/goptional
+```
+
+## Running tests
+
+Without coverage:
+
+```bash
+go test ./... -v
+```
+
+With coverage & HTML output:
+
+```bash
+go test ./... -v -race -covermode=atomic -coverprofile=coverage.txt
+go tool cover -html=coverage.txt
 ```
 
 ## Contributing

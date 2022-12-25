@@ -19,3 +19,6 @@ go.work
 
 # Visual Code
 .vscode
+
+# Test artifacts
+coverage.txt
