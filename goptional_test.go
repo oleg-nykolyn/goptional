@@ -546,3 +546,31 @@ func TestFlatMap_NilMapperOnNilInput(t *testing.T) {
 	}()
 	FlatMap[bool, bool](nil, nil)
 }
+
+func TestAnd_Empty(t *testing.T) {
+	require.True(t, Empty[string]().And(func() *Optional[string] { return Of("123") }).IsEmpty())
+}
+
+func TestAnd_NilSupplierOnEmpty(t *testing.T) {
+	require.True(t, Empty[string]().And(nil).IsEmpty())
+}
+
+func TestAnd_SuppliedEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.And(func() *Optional[int] { return Empty[int]() })
+	require.True(t, opt.IsEmpty())
+}
+
+func TestAnd_SuppliedNotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt = opt.And(func() *Optional[int] { return Of(321) })
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), 321)
+}
+
+func TestAnd_NilSupplierOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of(123).And(nil)
+}
