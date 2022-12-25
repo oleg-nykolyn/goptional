@@ -4,6 +4,12 @@
 
 A generics-based implementation of the `Optional` type in Go 🚀
 
+## Features
+
+- A recognizablle API that is *heavily* inspired by the Java & Rust implementations
+- Compatibility with all *value* and *reference* types
+- *Chainable* generic methods and functions
+
 ## Installation
 
 > *goptional* requires **go 1.19**
@@ -12,7 +18,16 @@ A generics-based implementation of the `Optional` type in Go 🚀
 go get -u github.com/nykolynoleg/goptional
 ```
 
-## Running tests
+## Examples
+
+> Refer to the [documentation](https://pkg.go.dev/github.com/nykolynoleg/goptional) for a complete reference.
+
+```go
+// Import goptional into your code and refer to it as `goptional`.
+import "github.com/nykolynoleg/goptional"
+```
+
+## Testing
 
 Without coverage:
 
@@ -29,7 +44,8 @@ go tool cover -html=coverage.txt
 
 ## Contributing
 
-We encourage and support an active, healthy community of contributors — including you! Details are in the [contribution guide](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md).
+Any kind of support is more than welcome 🤝  
+Refer to the [contribution guide](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md) for details.
 
 ## Creator
 
