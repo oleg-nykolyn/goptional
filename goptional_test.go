@@ -292,3 +292,45 @@ func TestIfPresent_NilActionOnNotEmpty(t *testing.T) {
 	}()
 	Of([]string{"a", "b", "c"}).IfPresent(nil)
 }
+
+func TestIfPresentOrElse_Empty(t *testing.T) {
+	var actionCalled, emptyActionCalled bool
+	Empty[string]().IfPresentOrElse(func(_ string) { actionCalled = true }, func() { emptyActionCalled = true })
+	require.False(t, actionCalled)
+	require.True(t, emptyActionCalled)
+}
+
+func TestIfPresentOrElse_NilValue(t *testing.T) {
+	var actionCalled, emptyActionCalled bool
+	Of[*string](nil).IfPresentOrElse(func(_ *string) { actionCalled = true }, func() { emptyActionCalled = true })
+	require.False(t, actionCalled)
+	require.True(t, emptyActionCalled)
+}
+
+func TestIfPresentOrElse_NotEmpty(t *testing.T) {
+	var actionCalled, emptyActionCalled bool
+	Of(123).IfPresentOrElse(func(_ int) { actionCalled = true }, func() { emptyActionCalled = true })
+	require.True(t, actionCalled)
+	require.False(t, emptyActionCalled)
+}
+
+func TestIfPresentOrElse_NilActionOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of(123).IfPresentOrElse(nil, func() {})
+}
+
+func TestIfPresentOrElse_NilEmptyActionOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Empty[string]().IfPresentOrElse(func(_ string) {}, nil)
+}
+
+func TestIfPresentOrElse_NilEmptyActionOnNilValue(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of[*string](nil).IfPresentOrElse(func(_ *string) {}, nil)
+}
