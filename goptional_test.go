@@ -143,18 +143,21 @@ func TestOf_ZeroValues(t *testing.T) {
 }
 
 func TestOf_NilValues(t *testing.T) {
+	optPtr := Of[*string](nil)
+	require.Nil(t, optPtr.wrappedValue)
+
+	optIface := Of[interface{}](nil)
+	require.Nil(t, optIface.wrappedValue)
+
 	optSlice := Of[[]string](nil)
 	require.Nil(t, optSlice.wrappedValue)
 
-	optFn := Of[func(int) bool](nil)
-	require.Nil(t, optFn.wrappedValue)
-
-	optPtr := Of[*string](nil)
-	require.Nil(t, optPtr.wrappedValue)
+	optMap := Of[map[string]interface{}](nil)
+	require.Nil(t, optMap.wrappedValue)
 
 	optCh := Of[chan int](nil)
 	require.Nil(t, optCh.wrappedValue)
 
-	optIface := Of[interface{}](nil)
-	require.Nil(t, optIface.wrappedValue)
+	optFn := Of[func(int) bool](nil)
+	require.Nil(t, optFn.wrappedValue)
 }
