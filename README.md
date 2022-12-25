@@ -30,10 +30,10 @@ import "github.com/nykolynoleg/goptional"
 ### Creation
 
 ```go
-// Creates an Optional that holds an int value.
+// Creates an Optional of the int type that holds 123.
 intOpt := goptional.Of(123)
 
-// Creates an empty Optional of type string.
+// Creates an empty Optional of the string type.
 strEmptyOpt := goptional.Empty[string]()
 
 // 'Of' returns an empty Optional if its argument is nil.
