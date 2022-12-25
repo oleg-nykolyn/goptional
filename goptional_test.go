@@ -209,7 +209,7 @@ func TestIsPresent_NilValue(t *testing.T) {
 	require.False(t, opt.IsPresent())
 }
 
-func TestIsPresent_NonZeroValue(t *testing.T) {
+func TestIsPresent_NotEmpty(t *testing.T) {
 	opt := Of("goptional")
 	require.True(t, opt.IsPresent())
 }
@@ -229,7 +229,7 @@ func TestIsEmpty_NilValue(t *testing.T) {
 	require.True(t, opt.IsEmpty())
 }
 
-func TestIsEmpty_NonZeroValue(t *testing.T) {
+func TestIsEmpty_NotEmpty(t *testing.T) {
 	opt := Of("goptional")
 	require.False(t, opt.IsEmpty())
 }
@@ -237,4 +237,29 @@ func TestIsEmpty_NonZeroValue(t *testing.T) {
 func TestIsEmpty_ZeroValue(t *testing.T) {
 	opt := Of("")
 	require.False(t, opt.IsEmpty())
+}
+
+func TestGet_NotEmpty(t *testing.T) {
+	s := "goptional"
+	opt := Of(s)
+	require.EqualValues(t, opt.Get(), s)
+}
+
+func TestGet_Empty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	opt := Empty[string]()
+	_ = opt.Get()
+}
+
+func TestGet_NilValue(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	opt := Of[*string](nil)
+	_ = opt.Get()
+}
+
+func TestIfPresent_NotEmpty(t *testing.T) {
 }
