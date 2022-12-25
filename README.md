@@ -12,7 +12,7 @@ A generics-based implementation of the `Optional` type in Go 🚀
 
 ## Installation
 
-> *goptional* requires **go 1.19**
+> ❗️ *goptional* requires **go 1.19**
 
 ```bash
 go get -u github.com/nykolynoleg/goptional
@@ -20,11 +20,74 @@ go get -u github.com/nykolynoleg/goptional
 
 ## Examples
 
-> Refer to the [documentation](https://pkg.go.dev/github.com/nykolynoleg/goptional) for a complete reference.
+> 👨🏻‍💻 Refer to the [documentation](https://pkg.go.dev/github.com/nykolynoleg/goptional) for a complete reference.
 
 ```go
 // Import goptional into your code and refer to it as `goptional`.
 import "github.com/nykolynoleg/goptional"
+```
+
+### Creation
+
+```go
+// Creates an Optional that holds an int value.
+intOpt := goptional.Of(123)
+
+// Creates an empty Optional of type string.
+strOpt := goptional.Empty[string]()
+
+// 'Of' returns an empty Optional if its argument is nil.
+strSliceOpt := goptional.Of[[]string](nil)
+
+// Note that if Of's argument is the zero value of a value type,
+// such as ("", false, 0) then a non-empty Optional is returned.
+emptyStrOpt := goptional.Of("")
+```
+
+### Inspection
+
+```go
+strOpt := goptional.Of("hello goptional")
+intOpt := goptional.Empty[int]()
+
+// Returns true if Optional holds a value.
+if strOpt.IsPresent() {
+    // ...
+}
+
+// Returns true if Optional is empty.
+if intOpt.IsEmpty() {
+    // ...
+}
+
+// Method chaining is supported.
+if goptional.Of(123).IsPresent() {
+    // ...
+}
+```
+
+### Retrieval
+
+```go
+// TODO
+```
+
+### Filtering
+
+```go
+// TODO
+```
+
+### Mapping
+
+```go
+// TODO
+```
+
+### Peeking
+
+```go
+// TODO
 ```
 
 ## Testing
