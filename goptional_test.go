@@ -198,3 +198,97 @@ func TestOf_NilPointer(t *testing.T) {
 	optPtr := Of[*string](nil)
 	require.Nil(t, optPtr.wrappedValue)
 }
+
+func TestIsPresent_Empty(t *testing.T) {
+	opt := Empty[string]()
+	require.False(t, opt.IsPresent())
+}
+
+func TestIsPresent_NilValue(t *testing.T) {
+	opt := Of[map[string]interface{}](nil)
+	require.False(t, opt.IsPresent())
+}
+
+func TestIsPresent_NotEmpty(t *testing.T) {
+	opt := Of("goptional")
+	require.True(t, opt.IsPresent())
+}
+
+func TestIsPresent_ZeroValue(t *testing.T) {
+	opt := Of("")
+	require.True(t, opt.IsPresent())
+}
+
+func TestIsEmpty_Empty(t *testing.T) {
+	opt := Empty[string]()
+	require.True(t, opt.IsEmpty())
+}
+
+func TestIsEmpty_NilValue(t *testing.T) {
+	opt := Of[map[string]interface{}](nil)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestIsEmpty_NotEmpty(t *testing.T) {
+	opt := Of("goptional")
+	require.False(t, opt.IsEmpty())
+}
+
+func TestIsEmpty_ZeroValue(t *testing.T) {
+	opt := Of("")
+	require.False(t, opt.IsEmpty())
+}
+
+func TestGet_NotEmpty(t *testing.T) {
+	s := "goptional"
+	opt := Of(s)
+	require.EqualValues(t, opt.Get(), s)
+}
+
+func TestGet_Empty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	opt := Empty[string]()
+	_ = opt.Get()
+}
+
+func TestGet_NilValue(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	opt := Of[*string](nil)
+	_ = opt.Get()
+}
+
+func TestIfPresent_NotEmpty(t *testing.T) {
+	optVal := 0
+	Of(123).IfPresent(func(x int) { optVal = x })
+	require.EqualValues(t, optVal, 123)
+}
+
+func TestIfPresent_Empty(t *testing.T) {
+	called := false
+	Empty[int]().IfPresent(func(_ int) { called = true })
+	require.False(t, called)
+}
+
+func TestIfPresent_NilValue(t *testing.T) {
+	called := false
+	Of[[]string](nil).IfPresent(func(_ []string) { called = true })
+	require.False(t, called)
+}
+
+func TestIfPresent_NilActionOnEmpty(t *testing.T) {
+	defer func() {
+		require.Nil(t, recover())
+	}()
+	Of[[]string](nil).IfPresent(nil)
+}
+
+func TestIfPresent_NilActionOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of([]string{"a", "b", "c"}).IfPresent(nil)
+}
