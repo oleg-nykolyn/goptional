@@ -177,7 +177,7 @@ func (o *Optional[T]) Or(supplier func() Optional[T]) Optional[T] {
 	return supplier()
 }
 
-// OrElse returns the value held by the Optional if it not empty, or the given value otherwise.
+// OrElse returns the value held by the Optional if it's not empty, or the given value otherwise.
 func (o *Optional[T]) OrElse(other T) T {
 	if o.IsPresent() {
 		return o.Get()
@@ -185,7 +185,7 @@ func (o *Optional[T]) OrElse(other T) T {
 	return other
 }
 
-// OrElseGet returns the value held by the Optional if it not empty, or a value provided by the given supplier otherwise.
+// OrElseGet returns the value held by the Optional if it's not empty, or a value provided by the given supplier otherwise.
 //
 // It panics if the Optional is empty and supplier is nil.
 func (o *Optional[T]) OrElseGet(supplier func() T) T {
@@ -195,7 +195,7 @@ func (o *Optional[T]) OrElseGet(supplier func() T) T {
 	return supplier()
 }
 
-// OrElsePanic returns the value held by the Optional if it not empty, or panics with an error message provided by the given supplier otherwise.
+// OrElsePanic returns the value held by the Optional if it's not empty, or panics with an error message provided by the given supplier otherwise.
 //
 // It panics if the Optional is empty and supplier is nil.
 func (o *Optional[T]) OrElsePanic(supplier func() string) T {
