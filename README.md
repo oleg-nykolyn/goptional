@@ -51,7 +51,7 @@ opt := goptional.Of[[]string](nil)
 opt := goptional.Of("")
 ```
 
-### Presence Verification
+### Inspection
 
 ```go
 opt := goptional.Of(123)
@@ -137,6 +137,26 @@ v := goptional.Of(123).
 ```
 
 ### Mapping
+
+`Map`
+
+```go
+opt := goptional.Of(123)
+```
+
+`MapOr`
+
+```go
+// TODO
+```
+
+`MapOrElse`
+
+```go
+// TODO
+```
+
+`FlatMap`
 
 ```go
 // TODO
