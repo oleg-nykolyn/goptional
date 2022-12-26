@@ -47,7 +47,7 @@ opt := goptional.Of[[]string](nil)
 
 ```go
 // Note that if the argument is the zero value of a value type,
-// such as "", false, 0 then a non-empty Optional is returned.
+// such as "", false, 0 then a non-empty Optional is returned instead.
 opt := goptional.Of("")
 ```
 
@@ -56,7 +56,7 @@ opt := goptional.Of("")
 ```go
 opt := goptional.Of(123)
 
-// Is true as opt holds 123.
+// Is true, as opt holds 123.
 if opt.IsPresent() {
     // ...
 }
@@ -117,7 +117,7 @@ opt := goptional.Of(123)
 
 // Apply a predicate to the value of opt, if there is any.
 opt = opt.Filter(func(v int) bool { return v > 100 })
-// Returns an empty Optional as 123 is not even.
+// Returns an empty Optional, as 123 is not even.
 opt = opt.Filter(func(v int) bool { return v%2 == 0 })
 
 v := 0
@@ -188,7 +188,28 @@ v := strOpt.OrElse("")
 `FlatMap`
 
 ```go
-// TODO
+opt := Of(123)
+
+// FlatMap is similar to Map, but the given supplier returns an Optional instead.
+// If you are familiar with Monads, think of it as AndThen.
+strOpt := FlatMap(opt, func(v int) *Optional[string] {
+    return Of(fmt.Sprintf("%v_mapped", v))
+})
+
+// v is "123_mapped"
+v := strOpt.OrElse("")
+```
+
+```go
+opt := Empty[int]()
+
+// Returns a new empty Optional of the target type, as opt is empty.
+strOpt := FlatMap(opt, func(v int) *Optional[string] {
+    return Of(fmt.Sprintf("%v_mapped", v))
+})
+
+// v is ""
+v := strOpt.OrElse("")
 ```
 
 ### Peeking
@@ -214,7 +235,7 @@ opt := goptional.Empty[int]()
 opt.IfPresentOrElse(func(v int) {
     // ...
 }, func() {
-    // This will be executed as 'opt' is empty.
+    // This will be executed, as 'opt' is empty.
 })
 ```
 
