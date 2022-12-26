@@ -143,7 +143,8 @@ v := goptional.Of(123).
 ```go
 opt := goptional.Of(123)
 
-// Apply the given transformation to the value of opt, if there is any, and return a new Optional of the target type.
+// Apply the given transformation to the value of opt, if there is any,
+// and return a new Optional of the target type.
 strOpt := goptional.Map(opt, func(v int) string {
     return fmt.Sprintf("%v_mapped", v)
 })
@@ -157,7 +158,8 @@ v := strOpt.OrElse("")
 ```go
 opt := goptional.Empty[int]()
 
-// Similar to Map, but returns an Optional holding the given default value if opt is empty.
+// Similar to Map, but returns an Optional holding
+// the given default value if opt is empty.
 strOpt := goptional.MapOr(opt, func(v int) string {
     return fmt.Sprintf("%v_mapped", v)
 }, "default")
@@ -171,7 +173,8 @@ v := strOpt.OrElse("")
 ```go
 opt := goptional.Empty[int]()
 
-// Similar to Map, but returns an Optional holding a default value provided by the given supplier if opt is empty.
+// Similar to Map, but returns an Optional holding
+// a default value provided by the given supplier if opt is empty.
 strOpt := goptional.MapOrElse(opt, func(v int) string {
     return fmt.Sprintf("%v_mapped", v)
 }, func() string {
