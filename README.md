@@ -100,15 +100,6 @@ v := opt.OrElseGet(func() string {
 })
 ```
 
-`OrElsePanic`
-
-```go
-opt := goptional.Empty[string]()
-
-// Panic if opt is empty.
-v := opt.OrElsePanic()
-```
-
 `OrElsePanicWithErr`
 
 ```go
