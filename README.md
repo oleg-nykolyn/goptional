@@ -184,6 +184,9 @@ opt := goptional.Empty[int]()
 opt = opt.And(func() *Optional[int] {
     return goptional.Of(123)
 })
+
+// v is 0.
+v := opt.OrElse(0)
 ```
 
 `Or`
@@ -195,6 +198,9 @@ opt := goptional.Empty[int]()
 opt = opt.Or(func() *Optional[int] {
     return goptional.Of(123)
 })
+
+// v is 123.
+v := opt.OrElse(0)
 ```
 
 ## Testing
