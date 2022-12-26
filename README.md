@@ -54,7 +54,6 @@ opt := goptional.Of("")
 ### Presence Verification
 
 ```go
-// Create an Optional of type int that holds 123.
 opt := goptional.Of(123)
 
 // Is true as the Optional holds 123.
