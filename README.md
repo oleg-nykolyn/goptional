@@ -210,7 +210,7 @@ opt.IfPresent(func(v int) {
 ```go
 opt := goptional.Empty[int]()
 
-// Similar to IfPresent, but execute a fallback action if opt is empty.
+// Similar to IfPresent, but executes a fallback action if opt is empty.
 opt.IfPresentOrElse(func(v int) {
     // ...
 }, func() {
