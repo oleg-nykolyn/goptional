@@ -51,7 +51,7 @@ opt := goptional.Of[[]string](nil)
 opt := goptional.Of("")
 ```
 
-### Inspection
+### Presence Checks
 
 ```go
 opt := goptional.Of(123)
