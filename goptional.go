@@ -50,19 +50,19 @@ func Of[T any](value T) (opt *Optional[T]) {
 	}
 }
 
-// IsPresent returns true if the Optional holds a value, and false otherwise.
+// IsPresent returns true if this Optional holds a value, and false otherwise.
 func (o *Optional[T]) IsPresent() bool {
 	return o.wrappedValue != nil
 }
 
-// IsEmpty returns true if the Optional is empty, and false otherwise.
+// IsEmpty returns true if this Optional is empty, and false otherwise.
 func (o *Optional[T]) IsEmpty() bool {
 	return o.wrappedValue == nil
 }
 
-// Get returns the value held by the Optional.
+// Get returns the value held by this Optional.
 //
-// It panics if the Optional is empty.
+// It panics if this Optional is empty.
 func (o *Optional[T]) Get() T {
 	if o.IsEmpty() {
 		panic(noValueErrMsg)
@@ -70,21 +70,21 @@ func (o *Optional[T]) Get() T {
 	return o.wrappedValue.value
 }
 
-// IfPresent applies the action to the value held by the Optional.
-// Does nothing if the Optional is empty.
+// IfPresent applies the action to the value held by this Optional.
+// Does nothing if this Optional is empty.
 //
-// It panics if action is nil and the Optional is not empty.
+// It panics if action is nil and this Optional is not empty.
 func (o *Optional[T]) IfPresent(action func(T)) {
 	if o.IsPresent() {
 		action(o.Get())
 	}
 }
 
-// IfPresentOrElse applies the action to the value held by the Optional or calls emptyAction if the Optional is empty.
+// IfPresentOrElse applies the action to the value held by this Optional or calls emptyAction if this Optional is empty.
 //
 // It panics if one of these is true:
-//   - action is nil and the Optional is not empty
-//   - emptyAction is nil and the Optional is empty
+//   - action is nil and this Optional is not empty
+//   - emptyAction is nil and this Optional is empty
 func (o *Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
 	if o.IsPresent() {
 		action(o.Get())
@@ -96,7 +96,7 @@ func (o *Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
 // Filter returns self if self is empty or
 // if the predicate applied to its value returns false.
 //
-// It panics if predicate is nil and the Optional is not empty.
+// It panics if predicate is nil and this Optional is not empty.
 func (o *Optional[T]) Filter(predicate func(T) bool) *Optional[T] {
 	if o.IsEmpty() || predicate(o.Get()) {
 		return o
@@ -163,7 +163,7 @@ func FlatMap[X, Y any](input *Optional[X], mapper func(X) *Optional[Y]) *Optiona
 //   - self if self is empty
 //   - a new Optional provided by the given supplier
 //
-// It panics if the Optional is not empty and supplier is nil.
+// It panics if this Optional is not empty and supplier is nil.
 func (o *Optional[T]) And(supplier func() *Optional[T]) *Optional[T] {
 	if o.IsEmpty() {
 		return o
@@ -175,7 +175,7 @@ func (o *Optional[T]) And(supplier func() *Optional[T]) *Optional[T] {
 //   - self if self is not empty
 //   - a new Optional provided by the given supplier
 //
-// It panics if the Optional is empty and supplier is nil.
+// It panics if this Optional is empty and supplier is nil.
 func (o *Optional[T]) Or(supplier func() *Optional[T]) *Optional[T] {
 	if o.IsPresent() {
 		return o
@@ -199,7 +199,7 @@ func (o *Optional[T]) Xor(opt *Optional[T]) *Optional[T] {
 	return opt
 }
 
-// OrElse returns the value held by the Optional if it's not empty, or the given value otherwise.
+// OrElse returns the value held by this Optional if it's not empty, or the given value otherwise.
 func (o *Optional[T]) OrElse(other T) T {
 	if o.IsPresent() {
 		return o.Get()
@@ -207,9 +207,9 @@ func (o *Optional[T]) OrElse(other T) T {
 	return other
 }
 
-// OrElseGet returns the value held by the Optional if it's not empty, or a value provided by the given supplier otherwise.
+// OrElseGet returns the value held by this Optional if it's not empty, or a value provided by the given supplier otherwise.
 //
-// It panics if the Optional is empty and supplier is nil.
+// It panics if this Optional is empty and supplier is nil.
 func (o *Optional[T]) OrElseGet(supplier func() T) T {
 	if o.IsPresent() {
 		return o.Get()
@@ -217,9 +217,9 @@ func (o *Optional[T]) OrElseGet(supplier func() T) T {
 	return supplier()
 }
 
-// OrElsePanicWithErr returns the value held by the Optional if it's not empty, or panics with an error provided by the given supplier otherwise.
+// OrElsePanicWithErr returns the value held by this Optional if it's not empty, or panics with an error provided by the given supplier otherwise.
 //
-// It panics if the Optional is empty and supplier is nil.
+// It panics if this Optional is empty and supplier is nil.
 func (o *Optional[T]) OrElsePanicWithErr(supplier func() error) T {
 	if o.IsEmpty() {
 		err := supplier()
