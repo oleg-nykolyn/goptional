@@ -201,10 +201,18 @@ func (o *Optional[T]) OrElseGet(supplier func() T) T {
 	return supplier()
 }
 
-// OrElsePanic returns the value held by the Optional if it's not empty, or panics with an error provided by the given supplier otherwise.
+// OrElsePanic returns the value held by the Optional if it's not empty, or panics otherwise.
+func (o *Optional[T]) OrElsePanic() T {
+	if o.IsEmpty() {
+		panic(errors.New(noValueErrMsg))
+	}
+	return o.Get()
+}
+
+// OrElsePanicWithErr returns the value held by the Optional if it's not empty, or panics with an error provided by the given supplier otherwise.
 //
 // It panics if the Optional is empty and supplier is nil.
-func (o *Optional[T]) OrElsePanic(supplier func() error) T {
+func (o *Optional[T]) OrElsePanicWithErr(supplier func() error) T {
 	if o.IsEmpty() {
 		err := supplier()
 		if err == nil {
