@@ -171,8 +171,36 @@ opt.IfPresentOrElse(func(v int) {
 
 ### Boolean Operators
 
+> Think of an empty `Optional` as `false` and `true` otherwise.  
+> The suppliers used in the examples below are lazily-evaluated.  
+> If a boolean expression can be *short-circuited*, the supplier is ignored.
+
+`And`
+
 ```go
-// TODO
+opt := goptional.Empty[int]()
+
+// Return the AND between opt & the supplied Optional.
+opt = opt.And(func() *Optional[int] {
+    return goptional.Of(123)
+})
+
+// v is 0.
+v := opt.OrElse(0)
+```
+
+`Or`
+
+```go
+opt := goptional.Empty[int]()
+
+// Return the OR between opt & the supplied Optional.
+opt = opt.Or(func() *Optional[int] {
+    return goptional.Of(123)
+})
+
+// v is 123.
+v := opt.OrElse(0)
 ```
 
 ## Testing
