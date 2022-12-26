@@ -675,21 +675,3 @@ func TestOrElsePanicWithErr_NilSupplierOnEmpty(t *testing.T) {
 	}()
 	Empty[string]().OrElsePanicWithErr(nil)
 }
-
-//
-
-func TestOrElsePanic_NotEmpty(t *testing.T) {
-	require.EqualValues(t, Of(123).OrElsePanic(), 123)
-}
-
-func TestOrElsePanic_Empty(t *testing.T) {
-	defer func() {
-		r := recover()
-		require.NotNil(t, r)
-		err, ok := r.(error)
-		require.True(t, ok)
-		require.Error(t, err)
-		require.EqualError(t, err, noValueErrMsg)
-	}()
-	Empty[string]().OrElsePanic()
-}
