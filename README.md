@@ -274,6 +274,18 @@ opt = opt.Or(func() *Optional[int] {
 v := opt.OrElse(0)
 ```
 
+`Xor`
+
+```go
+opt := goptional.Empty[int]()
+
+// XOR between opt & the given Optional.
+opt = opt.Xor(goptional.Of(321))
+
+// v is 321
+v := opt.OrElse(0)
+```
+
 ## Testing
 
 ```bash
