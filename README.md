@@ -56,7 +56,7 @@ opt := goptional.Of("")
 ```go
 opt := goptional.Of(123)
 
-// Is true as the Optional holds 123.
+// Is true as opt holds 123.
 if opt.IsPresent() {
     // ...
 }
@@ -74,7 +74,7 @@ if opt.IsEmpty() {
 ```go
 opt := goptional.Of(123)
 
-// Retrieve the value held by the Optional.
+// Retrieve the value held by opt.
 // Panic otherwise.
 v := opt.Get()
 ```
@@ -84,7 +84,7 @@ v := opt.Get()
 ```go
 opt := goptional.Empty[string]()
 
-// Provide a default if the Optional is empty.
+// Provide a default value if opt is empty.
 v := opt.OrElse("default")
 ```
 
@@ -93,7 +93,7 @@ v := opt.OrElse("default")
 ```go
 opt := goptional.Empty[string]()
 
-// Provide a default through a supplier if the Optional is empty.
+// Provide a default through a supplier if opt is empty.
 v := opt.OrElseGet(func() string {
     return "default"
 })
@@ -104,7 +104,7 @@ v := opt.OrElseGet(func() string {
 ```go
 opt := goptional.Empty[string]()
 
-// Panic with an error provided by the given supplier if the Optional is empty.
+// Panic with an error provided by the given supplier if opt is empty.
 v := opt.OrElsePanic(func() error {
     return errors.New("woops")
 })
@@ -115,7 +115,7 @@ v := opt.OrElsePanic(func() error {
 ```go
 opt := goptional.Of(123)
 
-// Apply predicates to the Optional value.
+// Apply a predicate to the value of opt, if there is any.
 opt = opt.Filter(func(v int) bool { return v > 100 })
 // Returns an empty Optional as 123 is not even.
 opt = opt.Filter(func(v int) bool { return v%2 == 0 })
@@ -149,7 +149,7 @@ v := goptional.Of(123).
 ```go
 opt := goptional.Of(123)
 
-// Execute the provided action on the value of the Optional, if there is any.
+// Execute the given action on the value of opt, if there is any.
 // Do nothing otherwise.
 opt.IfPresent(func(v int) {
     fmt.Println(v) // Prints '123'
@@ -161,7 +161,7 @@ opt.IfPresent(func(v int) {
 ```go
 opt := goptional.Empty[int]()
 
-// Same as above, but execute a fallback action if the Optional is empty.
+// Same as above, but execute a fallback action if opt is empty.
 opt.IfPresentOrElse(func(v int) {
     // ...
 }, func() {
@@ -171,7 +171,7 @@ opt.IfPresentOrElse(func(v int) {
 
 ### Boolean Operators
 
-> Think of an empty `Optional` as `false` and `true` otherwise.  
+> Think of an *empty* `Optional` as `false` and `true` otherwise.  
 > The suppliers used in the examples below are lazily-evaluated.  
 > If a boolean expression can be *short-circuited*, the supplier is ignored.
 
@@ -180,7 +180,7 @@ opt.IfPresentOrElse(func(v int) {
 ```go
 opt := goptional.Empty[int]()
 
-// Return the AND between opt & the supplied Optional.
+// AND between opt & the supplied Optional. Results in an Optional.
 opt = opt.And(func() *Optional[int] {
     return goptional.Of(123)
 })
@@ -194,7 +194,7 @@ v := opt.OrElse(0)
 ```go
 opt := goptional.Empty[int]()
 
-// Return the OR between opt & the supplied Optional.
+// OR between opt & the supplied Optional. Results in an Optional.
 opt = opt.Or(func() *Optional[int] {
     return goptional.Of(123)
 })
