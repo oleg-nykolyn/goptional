@@ -638,11 +638,11 @@ func TestOrElseGet_NilSupplierOnEmpty(t *testing.T) {
 }
 
 func TestOrElsePanic_NotEmpty(t *testing.T) {
-	require.EqualValues(t, Of(123).OrElsePanic(func() error { return errors.New("woops") }), 123)
+	require.EqualValues(t, Of(123).OrElsePanicWithErr(func() error { return errors.New("woops") }), 123)
 }
 
 func TestOrElsePanic_NilSupplierOnNotEmpty(t *testing.T) {
-	require.EqualValues(t, Of(123).OrElsePanic(nil), 123)
+	require.EqualValues(t, Of(123).OrElsePanicWithErr(nil), 123)
 }
 
 func TestOrElsePanic_Empty(t *testing.T) {
@@ -654,7 +654,7 @@ func TestOrElsePanic_Empty(t *testing.T) {
 		require.Error(t, err)
 		require.EqualError(t, err, "woops")
 	}()
-	Empty[string]().OrElsePanic(func() error { return errors.New("woops") })
+	Empty[string]().OrElsePanicWithErr(func() error { return errors.New("woops") })
 }
 
 func TestOrElsePanic_SuppliedNilOnEmpty(t *testing.T) {
@@ -666,12 +666,12 @@ func TestOrElsePanic_SuppliedNilOnEmpty(t *testing.T) {
 		require.Error(t, err)
 		require.EqualError(t, err, noValueErrMsg)
 	}()
-	Empty[string]().OrElsePanic(func() error { return nil })
+	Empty[string]().OrElsePanicWithErr(func() error { return nil })
 }
 
 func TestOrElsePanic_NilSupplierOnEmpty(t *testing.T) {
 	defer func() {
 		require.NotNil(t, recover())
 	}()
-	Empty[string]().OrElsePanic(nil)
+	Empty[string]().OrElsePanicWithErr(nil)
 }
