@@ -675,3 +675,37 @@ func TestOrElsePanicWithErr_NilSupplierOnEmpty(t *testing.T) {
 	}()
 	Empty[string]().OrElsePanicWithErr(nil)
 }
+
+func TestXor_NilOptOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Empty[string]().Xor(nil)
+}
+
+func TestXor_NilOptOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of(123).Xor(nil)
+}
+
+func TestXor_BothEmpty(t *testing.T) {
+	require.True(t, Empty[int]().Xor(Empty[int]()).IsEmpty())
+}
+
+func TestXor_BothNotEmpty(t *testing.T) {
+	require.True(t, Of(123).Xor(Of(321)).IsEmpty())
+}
+
+func TestXor_FirstEmpty(t *testing.T) {
+	opt := Empty[int]().Xor(Of(321))
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), 321)
+}
+
+func TestXor_SecondEmpty(t *testing.T) {
+	opt := Of(123).Xor(Empty[int]())
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), 123)
+}
