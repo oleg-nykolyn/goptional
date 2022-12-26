@@ -183,6 +183,22 @@ func (o *Optional[T]) Or(supplier func() *Optional[T]) *Optional[T] {
 	return supplier()
 }
 
+// Xor returns one of the following:
+//   - an empty Optional if both are either non-empty or empty
+//   - the first non-empty Optional between this one & opt
+//
+// It panics if opt is nil.
+func (o *Optional[T]) Xor(opt *Optional[T]) *Optional[T] {
+	if (o.IsPresent() && opt.IsPresent()) || (o.IsEmpty() && opt.IsEmpty()) {
+		return Empty[T]()
+	}
+
+	if o.IsPresent() {
+		return o
+	}
+	return opt
+}
+
 // OrElse returns the value held by the Optional if it's not empty, or the given value otherwise.
 func (o *Optional[T]) OrElse(other T) T {
 	if o.IsPresent() {
