@@ -30,52 +30,111 @@ import "github.com/nykolynoleg/goptional"
 ### Creation
 
 ```go
-// Creates an Optional of the int type that holds 123.
-intOpt := goptional.Of(123)
+// Create an Optional of type int that holds 123.
+// All value and reference types are supported.
+opt := goptional.Of(123)
+```
 
-// Creates an empty Optional of the string type.
-strEmptyOpt := goptional.Empty[string]()
+```go
+// Create an empty Optional of type string.
+opt := goptional.Empty[string]()
+```
 
+```go
 // 'Of' returns an empty Optional if its argument is nil.
-strSliceOpt := goptional.Of[[]string](nil)
+opt := goptional.Of[[]string](nil)
+```
 
+```go
 // Note that if the argument is the zero value of a value type,
 // such as "", false, 0 then a non-empty Optional is returned.
-strOpt := goptional.Of("")
+opt := goptional.Of("")
 ```
 
-### Inspection
+### Presence Verification
 
 ```go
-strOpt := goptional.Of("hello goptional")
-intEmptyOpt := goptional.Empty[int]()
+// Create an Optional of type int that holds 123.
+opt := goptional.Of(123)
 
-// Returns true if Optional holds a value.
-if strOpt.IsPresent() {
+// Is true as the Optional holds 123.
+if opt.IsPresent() {
     // ...
 }
 
-// Returns true if Optional is empty.
-if intEmptyOpt.IsEmpty() {
-    // ...
-}
-
-// Method chaining is supported.
-if goptional.Of(123).IsPresent() {
+// Is false.
+if opt.IsEmpty() {
     // ...
 }
 ```
 
-### Retrieval
+### Value Retrieval
+
+`Get`
 
 ```go
-// TODO
+opt := goptional.Of(123)
+
+// Retrieve the value held by the Optional.
+// Panic otherwise.
+v := opt.Get()
+```
+
+`OrElse`
+
+```go
+opt := goptional.Empty[string]()
+
+// Provide a default if the Optional is empty.
+v := opt.OrElse("default")
+```
+
+`OrElseGet`
+
+```go
+opt := goptional.Empty[string]()
+
+// Provide a default through a supplier if the Optional is empty.
+v := opt.OrElseGet(func() string {
+    return "default"
+})
+```
+
+`OrElsePanic`
+
+```go
+opt := goptional.Empty[string]()
+
+// Panic with an error provided by the given supplier if the Optional is empty.
+v := opt.OrElsePanic(func() error {
+    return errors.New("woops")
+})
 ```
 
 ### Filtering
 
 ```go
-// TODO
+opt := goptional.Of(123)
+
+// Apply predicates to the Optional value.
+opt = opt.Filter(func(v int) bool { return v > 100 })
+// Returns an empty Optional as 123 is not even.
+opt = opt.Filter(func(v int) bool { return v%2 == 0 })
+
+v := 0
+
+// Is false.
+if opt.IsPresent() {
+    v = opt.Get()
+}
+```
+
+```go
+// The example above can be rewritten in a fluent style.
+v := goptional.Of(123).
+    Filter(func(v int) bool { return v > 100 }).
+    Filter(func(v int) bool { return v%2 == 0 }).
+    OrElse(0)
 ```
 
 ### Mapping
@@ -85,6 +144,33 @@ if goptional.Of(123).IsPresent() {
 ```
 
 ### Peeking
+
+`IfPresent`
+
+```go
+opt := goptional.Of(123)
+
+// Execute the provided action on the value of the Optional, if there is any.
+// Do nothing otherwise.
+opt.IfPresent(func(v int) {
+    fmt.Println(v) // Prints '123'
+})
+```
+
+`IfPresentOrElse`
+
+```go
+opt := goptional.Empty[int]()
+
+// Same as above, but execute a fallback action if the Optional is empty.
+opt.IfPresentOrElse(func(v int) {
+    // ...
+}, func() {
+    // This will be executed as 'opt' is empty.
+})
+```
+
+### Boolean Operators
 
 ```go
 // TODO
