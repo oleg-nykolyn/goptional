@@ -142,18 +142,44 @@ v := goptional.Of(123).
 
 ```go
 opt := goptional.Of(123)
+
+// Apply the given transformation to the value of opt, if there is any, and return a new Optional of the target type.
+strOpt := goptional.Map(opt, func(v int) string {
+    return fmt.Sprintf("%v_mapped", v)
+})
+
+// v is "123_mapped"
+v := strOpt.OrElse("")
 ```
 
 `MapOr`
 
 ```go
-// TODO
+opt := goptional.Empty[int]()
+
+// Similar to Map, but returns an Optional holding the given default value if opt is empty.
+strOpt := goptional.MapOr(opt, func(v int) string {
+    return fmt.Sprintf("%v_mapped", v)
+}, "default")
+
+// v is "default"
+v := strOpt.OrElse("")
 ```
 
 `MapOrElse`
 
 ```go
-// TODO
+opt := goptional.Empty[int]()
+
+// Similar to Map, but returns an Optional holding a default value provided by the given supplier if opt is empty.
+strOpt := goptional.MapOrElse(opt, func(v int) string {
+    return fmt.Sprintf("%v_mapped", v)
+}, func() string {
+    return "default"
+})
+
+// v is "default"
+v := strOpt.OrElse("")
 ```
 
 `FlatMap`
@@ -181,7 +207,7 @@ opt.IfPresent(func(v int) {
 ```go
 opt := goptional.Empty[int]()
 
-// Same as above, but execute a fallback action if opt is empty.
+// Similar to IfPresent, but execute a fallback action if opt is empty.
 opt.IfPresentOrElse(func(v int) {
     // ...
 }, func() {
@@ -200,12 +226,12 @@ opt.IfPresentOrElse(func(v int) {
 ```go
 opt := goptional.Empty[int]()
 
-// AND between opt & the supplied Optional. Results in an Optional.
+// AND between opt & the supplied Optional.
 opt = opt.And(func() *Optional[int] {
     return goptional.Of(123)
 })
 
-// v is 0.
+// v is 0
 v := opt.OrElse(0)
 ```
 
@@ -214,12 +240,12 @@ v := opt.OrElse(0)
 ```go
 opt := goptional.Empty[int]()
 
-// OR between opt & the supplied Optional. Results in an Optional.
+// OR between opt & the supplied Optional.
 opt = opt.Or(func() *Optional[int] {
     return goptional.Of(123)
 })
 
-// v is 123.
+// v is 123
 v := opt.OrElse(0)
 ```
 
