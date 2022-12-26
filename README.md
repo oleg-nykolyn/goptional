@@ -56,12 +56,13 @@ opt := goptional.Of("")
 ```go
 opt := goptional.Of(123)
 
-// Is true, as opt holds 123.
+// Check if opt holds a value.
+// In this specific instance, it returns true.
 if opt.IsPresent() {
     // ...
 }
 
-// Is false.
+// Check if opt has no value.
 if opt.IsEmpty() {
     // ...
 }
@@ -97,6 +98,15 @@ opt := goptional.Empty[string]()
 v := opt.OrElseGet(func() string {
     return "default"
 })
+```
+
+`OrElsePanic`
+
+```go
+opt := goptional.Empty[string]()
+
+// Panic if opt is empty.
+v := opt.OrElsePanic()
 ```
 
 `OrElsePanicWithErr`
@@ -235,7 +245,7 @@ opt := goptional.Empty[int]()
 opt.IfPresentOrElse(func(v int) {
     // ...
 }, func() {
-    // This will be executed, as 'opt' is empty.
+    // This block will execute, as 'opt' is empty.
 })
 ```
 
