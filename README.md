@@ -7,7 +7,7 @@
 ## Features
 
 - A recognizablle API that is *heavily* inspired by the [Java](https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/util/Optional.java) & [Rust](https://doc.rust-lang.org/std/option/enum.Option.html) implementations
-- Compatibility with all *value* and *reference* types
+- Compatible with all *value* and *reference* types
 - Chainable and expressive [generic methods and functions](https://go.dev/doc/tutorial/generics)
 - Minimal overhead - no structs, `Optional` is just a singleton slice
 - Null safety *by design*
@@ -336,6 +336,16 @@ v := opt.OrElse(0)
 
 1. **Why are `Map`, `MapOr`, etc. implemented as functions and not methods of the `Optional` type?**  
 As of now, Go does **not** support method-level type parameters. This might change in the future.
+
+## TODOs
+
+- [ ] `OrZero`
+- [ ] `Zip`
+- [ ] `ZipWith`
+- [ ] `Unzip`
+- [ ] `UnzipWith`
+- [ ] `Take`
+- [ ] `Replace`
 
 ## Testing
 
