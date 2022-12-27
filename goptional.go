@@ -317,7 +317,7 @@ type Pair[X, Y any] struct {
 }
 
 // Zip zips o1 with o2.
-// If o1 and o2 are both non-empty, it returns an optional pair holding the value of o1 & o2.
+// If o1 and o2 are both non-empty, it returns an Optional Pair holding the values of o1 & o2.
 //
 // Otherwise, an empty Optional is returned.
 func Zip[X, Y any](o1 Optional[X], o2 Optional[Y]) Optional[*Pair[X, Y]] {
@@ -327,8 +327,8 @@ func Zip[X, Y any](o1 Optional[X], o2 Optional[Y]) Optional[*Pair[X, Y]] {
 	return Empty[*Pair[X, Y]]()
 }
 
-// Unzip unzips o containing a tuple of two Optionals.
-// If o is empty, it returns the unwrapped pair. Otherwise, two empty Optionals are returned.
+// Unzip unzips o containing a Pair of two Optionals.
+// If o is not empty, it returns the unwrapped pair. Otherwise, two empty Optionals are returned.
 func Unzip[X, Y any](o Optional[*Pair[Optional[X], Optional[Y]]]) (Optional[X], Optional[Y]) {
 	if o.IsPresent() {
 		pair := o.Get()
@@ -339,7 +339,7 @@ func Unzip[X, Y any](o Optional[*Pair[Optional[X], Optional[Y]]]) (Optional[X], 
 
 // ZipWith zips o1 with o2.
 // If o1 and o2 are both non-empty, it returns an Optional with a value
-// that results from the application of the given mapper to the value of o1 & o2.
+// that results from the application of the given mapper to the values of o1 & o2.
 // Otherwise, an empty Optional is returned.
 //
 // It panics if o1 & o2 are both non-empty and mapper is nil.
