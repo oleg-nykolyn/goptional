@@ -360,7 +360,6 @@ As of now, Go does **not** support method-level type parameters. This might chan
 
 ## TODOs
 
-- [ ] `OrZero`
 - [ ] `Zip`
 - [ ] `ZipWith`
 - [ ] `Unzip`
