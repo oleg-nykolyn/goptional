@@ -386,6 +386,32 @@ opt1 := goptional.Empty[int]()
 opt2 := opt1.Replace(789)
 ```
 
+### JSON
+
+`MarshalJSON`
+
+```go
+opt := goptional.Of(123)
+
+// Get the JSON representation of opt.
+// If opt is empty, []byte("null") is returned.
+jsonBytes, err := opt.MarshalJSON()
+```
+
+`UnmarshalJSON`
+
+```go
+opt := goptional.Empty[int]()
+intAsJSON := "123"
+
+// Populate opt with the given JSON.
+err := opt.UnmarshalJSON([]byte(intAsJSON))
+if err == nil {
+    // v is 123
+    v := opt.Get()
+}
+```
+
 ### String Representation
 
 `Optional` implements the `Stringer` interface and relies on [spew](https://github.com/davecgh/go-spew).
