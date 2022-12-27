@@ -183,15 +183,15 @@ func (o Optional[T]) Or(supplier func() Optional[T]) Optional[T] {
 
 // Xor returns one of the following:
 //   - an empty Optional if both are either non-empty or empty
-//   - the first non-empty Optional between this instance & opt
-func (o Optional[T]) Xor(opt Optional[T]) Optional[T] {
-	if (o.IsPresent() && opt.IsPresent()) || (o.IsEmpty() && opt.IsEmpty()) {
+//   - the first non-empty Optional between this instance & o2
+func (o Optional[T]) Xor(o2 Optional[T]) Optional[T] {
+	if (o.IsPresent() && o2.IsPresent()) || (o.IsEmpty() && o2.IsEmpty()) {
 		return Empty[T]()
 	}
 	if o.IsPresent() {
 		return o
 	}
-	return opt
+	return o2
 }
 
 // OrZero returns the value held by this instance, if there is any, or the zero value of T otherwise.
