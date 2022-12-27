@@ -183,14 +183,22 @@ func (o Optional[T]) Xor(opt Optional[T]) Optional[T] {
 	if (o.IsPresent() && opt.IsPresent()) || (o.IsEmpty() && opt.IsEmpty()) {
 		return Empty[T]()
 	}
-
 	if o.IsPresent() {
 		return o
 	}
 	return opt
 }
 
-// OrElse returns the value held by this instance if it's not empty, or the given value otherwise.
+// OrZero returns the value held by this instance, if there is any, or the zero value of T otherwise.
+func (o Optional[T]) OrZero() T {
+	if o.IsEmpty() {
+		var zero T
+		return zero
+	}
+	return o.Get()
+}
+
+// OrElse returns the value held by this instance, if there is any, or the given value otherwise.
 func (o Optional[T]) OrElse(other T) T {
 	if o.IsPresent() {
 		return o.Get()
@@ -198,7 +206,7 @@ func (o Optional[T]) OrElse(other T) T {
 	return other
 }
 
-// OrElseGet returns the value held by this instance if it's not empty, or a value provided by the given supplier otherwise.
+// OrElseGet returns the value held by this instance, if there is any, or a value provided by the given supplier otherwise.
 //
 // It panics if this instance is empty and supplier is nil.
 func (o Optional[T]) OrElseGet(supplier func() T) T {
@@ -208,7 +216,7 @@ func (o Optional[T]) OrElseGet(supplier func() T) T {
 	return supplier()
 }
 
-// OrElsePanicWithErr returns the value held by this instance if it's not empty, or panics with an error provided by the given supplier otherwise.
+// OrElsePanicWithErr returns the value held by this instance, if there is any, or panics with an error provided by the given supplier otherwise.
 //
 // It panics if this instance is empty and supplier is nil.
 func (o Optional[T]) OrElsePanicWithErr(supplier func() error) T {
