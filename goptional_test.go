@@ -22,32 +22,11 @@ func TestOf_ValidValue(t *testing.T) {
 }
 
 func TestOf_InvalidValue(t *testing.T) {
-	defer func() {
-		err := recover()
-		require.NotNil(t, err)
-		require.EqualValues(t, err, "value is invalid")
-	}()
-	Of[interface{}](nil)
+	require.True(t, Of[interface{}](nil).IsEmpty())
 }
 
 func TestOf_NilValue(t *testing.T) {
-	defer func() {
-		err := recover()
-		require.NotNil(t, err)
-		require.EqualValues(t, err, "value is nil")
-	}()
-	Of[*string](nil)
-}
-
-func TestOfNillable_NilValue(t *testing.T) {
-	require.Empty(t, OfNillable[string](nil))
-}
-
-func TestOfNillable_NotNilValue(t *testing.T) {
-	v := []int{1, 2, 3}
-	opt := OfNillable(&v)
-	require.NotEmpty(t, opt)
-	require.EqualValues(t, opt[0], &v)
+	require.True(t, Of[*string](nil).IsEmpty())
 }
 
 func TestIsPresent_Empty(t *testing.T) {
@@ -56,7 +35,7 @@ func TestIsPresent_Empty(t *testing.T) {
 }
 
 func TestIsPresent_NilValue(t *testing.T) {
-	opt := OfNillable[map[string]interface{}](nil)
+	opt := Of[map[string]interface{}](nil)
 	require.False(t, opt.IsPresent())
 }
 
@@ -76,7 +55,7 @@ func TestIsEmpty_Empty(t *testing.T) {
 }
 
 func TestIsEmpty_NilValue(t *testing.T) {
-	opt := OfNillable[map[string]interface{}](nil)
+	opt := Of[map[string]interface{}](nil)
 	require.True(t, opt.IsEmpty())
 }
 
@@ -112,7 +91,7 @@ func TestGet_NilValue(t *testing.T) {
 		require.NotNil(t, r)
 		require.ErrorIs(t, r.(error), ErrNoValue)
 	}()
-	opt := OfNillable[string](nil)
+	opt := Of[*string](nil)
 	_ = opt.Get()
 }
 
@@ -130,7 +109,7 @@ func TestIfPresent_Empty(t *testing.T) {
 
 func TestIfPresent_NilValue(t *testing.T) {
 	called := false
-	OfNillable[[]string](nil).IfPresent(func(_ **[]string) { called = true })
+	Of[[]string](nil).IfPresent(func(_ *[]string) { called = true })
 	require.False(t, called)
 }
 
@@ -138,7 +117,7 @@ func TestIfPresent_NilActionOnEmpty(t *testing.T) {
 	defer func() {
 		require.Nil(t, recover())
 	}()
-	OfNillable[[]string](nil).IfPresent(nil)
+	Of[[]string](nil).IfPresent(nil)
 }
 
 func TestIfPresent_NilActionOnNotEmpty(t *testing.T) {
@@ -157,7 +136,7 @@ func TestIfPresentOrElse_Empty(t *testing.T) {
 
 func TestIfPresentOrElse_NilValue(t *testing.T) {
 	var actionCalled, emptyActionCalled bool
-	OfNillable[string](nil).IfPresentOrElse(func(_ **string) { actionCalled = true }, func() { emptyActionCalled = true })
+	Of[*string](nil).IfPresentOrElse(func(_ **string) { actionCalled = true }, func() { emptyActionCalled = true })
 	require.False(t, actionCalled)
 	require.True(t, emptyActionCalled)
 }
@@ -187,7 +166,7 @@ func TestIfPresentOrElse_NilEmptyActionOnNilValue(t *testing.T) {
 	defer func() {
 		require.NotNil(t, recover())
 	}()
-	OfNillable[string](nil).IfPresentOrElse(func(_ **string) {}, nil)
+	Of[*string](nil).IfPresentOrElse(func(_ **string) {}, nil)
 }
 
 func TestFilter_Empty(t *testing.T) {
@@ -197,7 +176,7 @@ func TestFilter_Empty(t *testing.T) {
 }
 
 func TestFilter_NilValue(t *testing.T) {
-	opt := OfNillable[[]string](nil)
+	opt := Of[*[]string](nil)
 	opt = opt.Filter(func(_ **[]string) bool { return true })
 	require.True(t, opt.IsEmpty())
 }
@@ -226,7 +205,7 @@ func TestFilter_PredicateNotOkOnEmpty(t *testing.T) {
 }
 
 func TestFilter_PredicateNotOkOnNilValue(t *testing.T) {
-	opt := OfNillable[string](nil)
+	opt := Of[*string](nil)
 	opt = opt.Filter(func(_ **string) bool { return false })
 	require.True(t, opt.IsEmpty())
 }
@@ -679,7 +658,7 @@ func TestTake_Empty(t *testing.T) {
 }
 
 func TestTake_Nil(t *testing.T) {
-	opt := OfNillable[string](nil)
+	opt := Of[*string](nil)
 	opt2 := opt.Take()
 	require.True(t, opt.IsEmpty())
 	require.True(t, opt2.IsEmpty())
@@ -696,9 +675,9 @@ func TestTake_NotEmpty(t *testing.T) {
 	require.EqualValues(t, opt2.Get(), 123)
 }
 
-func TestTake_Nillable(t *testing.T) {
+func TestTake_Ptr(t *testing.T) {
 	v := []interface{}{"a", 123, 321, false, []string{}, nil}
-	opt := OfNillable(&v)
+	opt := Of(&v)
 	opt2 := opt.Take()
 
 	require.Nil(t, opt)
@@ -829,7 +808,7 @@ func TestFlatten_NotEmpty(t *testing.T) {
 	require.EqualValues(t, opt.Get(), 123)
 }
 
-func TestZip_Empty(t *testing.T) {
+func TestZip_SomeEmpty(t *testing.T) {
 	require.True(t, Zip(Empty[int](), Empty[string]()).IsEmpty())
 	require.True(t, Zip(Of(123), Empty[string]()).IsEmpty())
 	require.True(t, Zip(Empty[int](), Of("gm")).IsEmpty())
@@ -893,4 +872,32 @@ func TestUnzip_BothEmpty(t *testing.T) {
 
 	require.True(t, o2.IsEmpty())
 	require.EqualValues(t, o2, pair.Second)
+}
+
+func TestZipWith_SomeEmpty(t *testing.T) {
+	require.True(t, ZipWith[string, int, interface{}](Empty[string](), Empty[int](), nil).IsEmpty())
+	require.True(t, ZipWith[string, int, interface{}](Of("gm"), Empty[int](), nil).IsEmpty())
+	require.True(t, ZipWith[string, int, interface{}](Empty[string](), Of(123), nil).IsEmpty())
+}
+
+func TestZipWith_NilMapperOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	ZipWith[string, int, interface{}](Of("gm"), Of(123), nil)
+}
+
+func TestZipWith_BothNotEmpty(t *testing.T) {
+	opt := ZipWith(Of("gm"), Of([]int{1, 2, 3, 4}), func(x *string, y *[]int) []interface{} {
+		return []interface{}{*x, *y}
+	})
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), []interface{}{"gm", []int{1, 2, 3, 4}})
+}
+
+func TestZipWith_BothNotEmptyWithNilReturn(t *testing.T) {
+	opt := ZipWith(Of("gm"), Of([]int{1, 2, 3, 4}), func(x *string, y *[]int) []interface{} {
+		return nil
+	})
+	require.True(t, opt.IsEmpty())
 }

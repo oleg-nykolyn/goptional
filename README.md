@@ -36,6 +36,14 @@ import "github.com/nykolynoleg/goptional"
 ```go
 // Create an Optional of type int that holds 123.
 opt := goptional.Of(123)
+
+// If the argument to Of is either nil or invalid, an empty Optional is returned instead.
+opt2 := goptional.Of[[]string](nil)
+
+// Is true.
+if opt2.IsEmpty() {
+    // ...
+}
 ```
 
 `Empty`
@@ -53,27 +61,6 @@ if opt == nil {
 
 // Will not panic.
 if opt.IsPresent() {
-    // ...
-}
-```
-
-`OfNillable`
-
-```go
-// Create an Optional of type *string that holds the address of s.
-s := "gm goptional"
-opt := goptional.OfNillable[string](&s)
-
-// Is true.
-if opt.IsPresent() {
-    // ...
-}
-
-// If the argument to OfNillable is nil, an empty Optional is returned instead.
-opt2 := goptional.OfNillable[string](nil)
-
-// Is false.
-if opt2.IsPresent() {
     // ...
 }
 ```

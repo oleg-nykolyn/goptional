@@ -26,30 +26,21 @@ func Empty[T any]() Optional[T] {
 }
 
 // Of returns a new Optional that holds the given value.
-// It panics if value is nil or invalid.
+// It returns an empty Optional if the given value is either invalid or nil.
 func Of[T any](value T) (opt Optional[T]) {
 	v := reflect.ValueOf(value)
 	if !v.IsValid() {
-		panic("value is invalid")
+		return Empty[T]()
 	}
 	switch v.Kind() {
 	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
 		if v.IsNil() {
-			panic("value is nil")
+			return Empty[T]()
 		}
 		fallthrough
 	default:
 		return []T{value}
 	}
-}
-
-// OfNillable returns a new Optional that holds the given pointer.
-// If value is nil, an empty Optional is returned instead.
-func OfNillable[T any](value *T) (opt Optional[*T]) {
-	if value == nil {
-		return Empty[*T]()
-	}
-	return Of(value)
 }
 
 // IsPresent returns true if this instance holds a value, and false otherwise.
@@ -361,7 +352,7 @@ func ZipWith[X, Y, Z any](o1 Optional[X], o2 Optional[Y], mapper func(*X, *Y) Z)
 	return Empty[Z]()
 }
 
-// Flatten flattens the given optional.
+// Flatten flattens the given Optional.
 func Flatten[T any](o Optional[Optional[T]]) Optional[T] {
 	if o.IsPresent() {
 		return o.Get()
