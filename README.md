@@ -150,10 +150,10 @@ opt := goptional.Empty[string]()
 // the zero value of its type otherwise.
 //
 // Some zero values:
-//  string -> ""
-//  bool -> false
-//  int -> 0
-//  ptr -> nil
+// string -> ""
+// bool -> false
+// int -> 0
+// ptr -> nil
 v := opt.OrZero()
 
 // Is true.
@@ -392,7 +392,7 @@ opt2 := opt1.Replace(789)
 opt := goptional.Of(123)
 
 // Get the JSON representation of opt.
-// []byte("null") is returned for any empty Optional.
+// Marshal returns []byte("null") if an Optional is empty.
 jsonBytes, err := opt.MarshalJSON()
 ```
 
