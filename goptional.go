@@ -183,22 +183,30 @@ func (o Optional[T]) Xor(opt Optional[T]) Optional[T] {
 	if (o.IsPresent() && opt.IsPresent()) || (o.IsEmpty() && opt.IsEmpty()) {
 		return Empty[T]()
 	}
-
 	if o.IsPresent() {
 		return o
 	}
 	return opt
 }
 
-// OrElse returns the value held by this instance if it's not empty, or the given value otherwise.
-func (o Optional[T]) OrElse(other T) T {
+// OrZero returns the value held by this instance, if there is any, or the zero value of T otherwise.
+func (o Optional[T]) OrZero() T {
+	if o.IsEmpty() {
+		var zero T
+		return zero
+	}
+	return o.Get()
+}
+
+// OrElse returns the value held by this instance, if there is any, or the given value otherwise.
+func (o Optional[T]) OrElse(fallback T) T {
 	if o.IsPresent() {
 		return o.Get()
 	}
-	return other
+	return fallback
 }
 
-// OrElseGet returns the value held by this instance if it's not empty, or a value provided by the given supplier otherwise.
+// OrElseGet returns the value held by this instance, if there is any, or a value provided by the given supplier otherwise.
 //
 // It panics if this instance is empty and supplier is nil.
 func (o Optional[T]) OrElseGet(supplier func() T) T {
@@ -208,7 +216,7 @@ func (o Optional[T]) OrElseGet(supplier func() T) T {
 	return supplier()
 }
 
-// OrElsePanicWithErr returns the value held by this instance if it's not empty, or panics with an error provided by the given supplier otherwise.
+// OrElsePanicWithErr returns the value held by this instance, if there is any, or panics with an error provided by the given supplier otherwise.
 //
 // It panics if this instance is empty and supplier is nil.
 func (o Optional[T]) OrElsePanicWithErr(supplier func() error) T {
@@ -242,4 +250,28 @@ func (o Optional[T]) String() string {
 		return "Optional.empty"
 	}
 	return spew.Sprintf("Optional[%#+v]", o.Get())
+}
+
+// Take takes the value out of this instance, if there is any, leaving an empty Optional in its place.
+func (o *Optional[T]) Take() Optional[T] {
+	if o.IsEmpty() {
+		return *o
+	}
+	v := o.Get()
+	*o = nil
+	return Of(v)
+}
+
+// Replace replaces the value in this instance with the given value,
+// returning the old value if present, leaving a non-empty Optional in its place
+// without deinitializing either one.
+func (o *Optional[T]) Replace(value T) Optional[T] {
+	inOpt := Of(value)
+	if o.IsEmpty() {
+		*o = inOpt
+		return Empty[T]()
+	}
+	v := o.Get()
+	*o = inOpt
+	return Of(v)
 }

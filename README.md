@@ -142,6 +142,27 @@ v := opt.OrElseGet(func() string {
 })
 ```
 
+`OrZero`
+
+```go
+opt := goptional.Empty[string]()
+
+// Retrieve the value held by opt or 
+// the zero value of its type otherwise.
+//
+// Some zero values:
+//  string -> ""
+//  bool -> false
+//  int -> 0
+//  ptr -> nil
+v := opt.OrZero()
+
+// Is true.
+if v == "" {
+    // ...
+}
+```
+
 `OrElsePanicWithErr`
 
 ```go
@@ -328,6 +349,42 @@ opt = opt.Xor(goptional.Of(321))
 v := opt.OrElse(0)
 ```
 
+### Mutations
+
+`Take`
+
+```go
+opt1 := goptional.Of(123)
+
+// Take the value from opt, if there is any,
+// transfer it to opt2 and leave opt1 empty.
+opt2 := opt1.Take()
+
+// Is true.
+if opt1.IsEmpty() {
+    // ...
+}
+
+// v is 123
+v := opt2.Get()
+```
+
+`Replace`
+
+```go
+opt1 := goptional.Of(123)
+
+// opt1 -> 789, opt2 -> 123
+opt2 := opt1.Replace(789)
+```
+
+```go
+opt1 := goptional.Empty[int]()
+
+// opt1 -> 789, opt2 -> Empty
+opt2 := opt1.Replace(789)
+```
+
 ### String Representation
 
 `Optional` implements the `Stringer` interface and relies on [spew](https://github.com/davecgh/go-spew).
@@ -339,13 +396,10 @@ As of now, Go does **not** support method-level type parameters. This might chan
 
 ## TODOs
 
-- [ ] `OrZero`
 - [ ] `Zip`
 - [ ] `ZipWith`
 - [ ] `Unzip`
 - [ ] `UnzipWith`
-- [ ] `Take`
-- [ ] `Replace`
 
 ## Testing
 
