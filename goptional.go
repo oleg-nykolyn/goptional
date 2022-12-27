@@ -199,11 +199,11 @@ func (o Optional[T]) OrZero() T {
 }
 
 // OrElse returns the value held by this instance, if there is any, or the given value otherwise.
-func (o Optional[T]) OrElse(other T) T {
+func (o Optional[T]) OrElse(fallback T) T {
 	if o.IsPresent() {
 		return o.Get()
 	}
-	return other
+	return fallback
 }
 
 // OrElseGet returns the value held by this instance, if there is any, or a value provided by the given supplier otherwise.
@@ -259,5 +259,31 @@ func (o *Optional[T]) Take() Optional[T] {
 	}
 	v := o.Get()
 	*o = nil
+	return Of(v)
+}
+
+// Replace replaces the value in this instance with the given value,
+// returning the old value if present, leaving a non-empty Optional in its place
+// without deinitializing either one.
+func (o *Optional[T]) Replace(value T) Optional[T] {
+	if o.IsEmpty() {
+		return *o
+	}
+	v := o.Get()
+	*o = Of(value)
+	return Of(v)
+}
+
+// ReplaceWith replaces the value in this instance with the value provided by the given supplier,
+// returning the old value if present, leaving a non-empty Optional in its place
+// without deinitializing either one.
+//
+// It panics if this instance is not empty and supplier is nil.
+func (o *Optional[T]) ReplaceWith(supplier func() T) Optional[T] {
+	if o.IsEmpty() {
+		return *o
+	}
+	v := o.Get()
+	*o = Of(supplier())
 	return Of(v)
 }

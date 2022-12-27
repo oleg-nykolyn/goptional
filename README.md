@@ -364,8 +364,6 @@ As of now, Go does **not** support method-level type parameters. This might chan
 - [ ] `ZipWith`
 - [ ] `Unzip`
 - [ ] `UnzipWith`
-- [ ] `Take`
-- [ ] `Replace`
 
 ## Testing
 
