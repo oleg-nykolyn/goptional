@@ -106,7 +106,6 @@ func (o Optional[T]) Filter(predicate func(*T) bool) Optional[T] {
 }
 
 // Map returns one of the following:
-//
 //   - an empty Optional if input is empty
 //   - a new Optional holding a value that results from the application of the given mapper to the value of input
 //
@@ -144,7 +143,6 @@ func MapOrElse[X, Y any](input Optional[X], mapper func(*X) Y, supplier func() Y
 }
 
 // FlatMap returns one of the following:
-//
 //   - an empty Optional if input is empty
 //   - a new Optional that results from the application of the given mapper to the value of input
 //
