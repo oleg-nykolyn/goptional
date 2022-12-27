@@ -76,9 +76,10 @@ func (o Optional[T]) Get() T {
 // Does nothing if this instance is empty.
 //
 // It panics if action is nil and this instance is not empty.
-func (o Optional[T]) IfPresent(action func(T)) {
+func (o Optional[T]) IfPresent(action func(*T)) {
 	if o.IsPresent() {
-		action(o.Get())
+		v := o.Get()
+		action(&v)
 	}
 }
 
@@ -87,9 +88,10 @@ func (o Optional[T]) IfPresent(action func(T)) {
 // It panics if one of these is true:
 //   - action is nil and this instance is not empty
 //   - emptyAction is nil and this instance is empty
-func (o Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
+func (o Optional[T]) IfPresentOrElse(action func(*T), emptyAction func()) {
 	if o.IsPresent() {
-		action(o.Get())
+		v := o.Get()
+		action(&v)
 	} else {
 		emptyAction()
 	}
@@ -99,10 +101,16 @@ func (o Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
 // if the predicate applied to its value returns false.
 //
 // It panics if predicate is nil and this instance is not empty.
-func (o Optional[T]) Filter(predicate func(T) bool) Optional[T] {
-	if o.IsEmpty() || predicate(o.Get()) {
+func (o Optional[T]) Filter(predicate func(*T) bool) Optional[T] {
+	if o.IsEmpty() {
 		return o
 	}
+
+	v := o.Get()
+	if predicate(&v) {
+		return o
+	}
+
 	return Empty[T]()
 }
 
@@ -112,21 +120,23 @@ func (o Optional[T]) Filter(predicate func(T) bool) Optional[T] {
 //   - a new Optional holding a value that results from the application of the given mapper to the value of input
 //
 // It panics if mapper is nil and input is not empty.
-func Map[X, Y any](input Optional[X], mapper func(X) Y) Optional[Y] {
+func Map[X, Y any](input Optional[X], mapper func(*X) Y) Optional[Y] {
 	if input.IsEmpty() {
 		return Empty[Y]()
 	}
-	return Of(mapper(input.Get()))
+	v := input.Get()
+	return Of(mapper(&v))
 }
 
 // MapOr is similar to Map, but if input is empty, it returns a new Optional holding a default value instead.
 //
 // It panics if mapper is nil and input is not empty.
-func MapOr[X, Y any](input Optional[X], mapper func(X) Y, other Y) Optional[Y] {
+func MapOr[X, Y any](input Optional[X], mapper func(*X) Y, other Y) Optional[Y] {
 	if input.IsEmpty() {
 		return Of(other)
 	}
-	return Of(mapper(input.Get()))
+	v := input.Get()
+	return Of(mapper(&v))
 }
 
 // MapOrElse is similar to MapOr, but if input is empty, it returns a new Optional holding the value provided by the given supplier.
@@ -134,11 +144,12 @@ func MapOr[X, Y any](input Optional[X], mapper func(X) Y, other Y) Optional[Y] {
 // It panics if one of these is true:
 //   - supplier is nil and input is empty
 //   - mapper is nil and input is not empty
-func MapOrElse[X, Y any](input Optional[X], mapper func(X) Y, supplier func() Y) Optional[Y] {
+func MapOrElse[X, Y any](input Optional[X], mapper func(*X) Y, supplier func() Y) Optional[Y] {
 	if input.IsEmpty() {
 		return Of(supplier())
 	}
-	return Of(mapper(input.Get()))
+	v := input.Get()
+	return Of(mapper(&v))
 }
 
 // FlatMap returns one of the following:
@@ -147,11 +158,12 @@ func MapOrElse[X, Y any](input Optional[X], mapper func(X) Y, supplier func() Y)
 //   - a new Optional that results from the application of the given mapper to the value of input
 //
 // It panics if mapper is nil and input is not empty.
-func FlatMap[X, Y any](input Optional[X], mapper func(X) Optional[Y]) Optional[Y] {
+func FlatMap[X, Y any](input Optional[X], mapper func(*X) Optional[Y]) Optional[Y] {
 	if input.IsEmpty() {
 		return Empty[Y]()
 	}
-	return mapper(input.Get())
+	v := input.Get()
+	return mapper(&v)
 }
 
 // And returns one of the following:
@@ -340,9 +352,11 @@ func Unzip[X, Y any](o Optional[*Pair[Optional[X], Optional[Y]]]) (Optional[X], 
 // Otherwise, an empty Optional is returned.
 //
 // It panics if o1 & o2 are both non-empty and mapper is nil.
-func ZipWith[X, Y, Z any](o1 Optional[X], o2 Optional[Y], mapper func(X, Y) Z) Optional[Z] {
+func ZipWith[X, Y, Z any](o1 Optional[X], o2 Optional[Y], mapper func(*X, *Y) Z) Optional[Z] {
 	if o1.IsPresent() && o2.IsPresent() {
-		return Of(mapper(o1.Get(), o2.Get()))
+		v1 := o1.Get()
+		v2 := o2.Get()
+		return Of(mapper(&v1, &v2))
 	}
 	return Empty[Z]()
 }

@@ -118,19 +118,19 @@ func TestGet_NilValue(t *testing.T) {
 
 func TestIfPresent_NotEmpty(t *testing.T) {
 	optVal := 0
-	Of(123).IfPresent(func(x int) { optVal = x })
+	Of(123).IfPresent(func(x *int) { optVal = *x })
 	require.EqualValues(t, optVal, 123)
 }
 
 func TestIfPresent_Empty(t *testing.T) {
 	called := false
-	Empty[int]().IfPresent(func(_ int) { called = true })
+	Empty[int]().IfPresent(func(_ *int) { called = true })
 	require.False(t, called)
 }
 
 func TestIfPresent_NilValue(t *testing.T) {
 	called := false
-	OfNillable[[]string](nil).IfPresent(func(_ *[]string) { called = true })
+	OfNillable[[]string](nil).IfPresent(func(_ **[]string) { called = true })
 	require.False(t, called)
 }
 
@@ -150,21 +150,21 @@ func TestIfPresent_NilActionOnNotEmpty(t *testing.T) {
 
 func TestIfPresentOrElse_Empty(t *testing.T) {
 	var actionCalled, emptyActionCalled bool
-	Empty[string]().IfPresentOrElse(func(_ string) { actionCalled = true }, func() { emptyActionCalled = true })
+	Empty[string]().IfPresentOrElse(func(_ *string) { actionCalled = true }, func() { emptyActionCalled = true })
 	require.False(t, actionCalled)
 	require.True(t, emptyActionCalled)
 }
 
 func TestIfPresentOrElse_NilValue(t *testing.T) {
 	var actionCalled, emptyActionCalled bool
-	OfNillable[string](nil).IfPresentOrElse(func(_ *string) { actionCalled = true }, func() { emptyActionCalled = true })
+	OfNillable[string](nil).IfPresentOrElse(func(_ **string) { actionCalled = true }, func() { emptyActionCalled = true })
 	require.False(t, actionCalled)
 	require.True(t, emptyActionCalled)
 }
 
 func TestIfPresentOrElse_NotEmpty(t *testing.T) {
 	var actionCalled, emptyActionCalled bool
-	Of(123).IfPresentOrElse(func(_ int) { actionCalled = true }, func() { emptyActionCalled = true })
+	Of(123).IfPresentOrElse(func(_ *int) { actionCalled = true }, func() { emptyActionCalled = true })
 	require.True(t, actionCalled)
 	require.False(t, emptyActionCalled)
 }
@@ -180,31 +180,31 @@ func TestIfPresentOrElse_NilEmptyActionOnEmpty(t *testing.T) {
 	defer func() {
 		require.NotNil(t, recover())
 	}()
-	Empty[string]().IfPresentOrElse(func(_ string) {}, nil)
+	Empty[string]().IfPresentOrElse(func(_ *string) {}, nil)
 }
 
 func TestIfPresentOrElse_NilEmptyActionOnNilValue(t *testing.T) {
 	defer func() {
 		require.NotNil(t, recover())
 	}()
-	OfNillable[string](nil).IfPresentOrElse(func(_ *string) {}, nil)
+	OfNillable[string](nil).IfPresentOrElse(func(_ **string) {}, nil)
 }
 
 func TestFilter_Empty(t *testing.T) {
 	opt := Empty[string]()
-	opt = opt.Filter(func(_ string) bool { return true })
+	opt = opt.Filter(func(_ *string) bool { return true })
 	require.True(t, opt.IsEmpty())
 }
 
 func TestFilter_NilValue(t *testing.T) {
 	opt := OfNillable[[]string](nil)
-	opt = opt.Filter(func(_ *[]string) bool { return true })
+	opt = opt.Filter(func(_ **[]string) bool { return true })
 	require.True(t, opt.IsEmpty())
 }
 
 func TestFilter_NotEmpty(t *testing.T) {
 	opt := Of(123)
-	opt = opt.Filter(func(_ int) bool { return true })
+	opt = opt.Filter(func(_ *int) bool { return true })
 	require.True(t, opt.IsPresent())
 }
 
@@ -221,24 +221,24 @@ func TestFilter_NilPredicateOnNotEmpty(t *testing.T) {
 
 func TestFilter_PredicateNotOkOnEmpty(t *testing.T) {
 	opt := Empty[string]()
-	opt = opt.Filter(func(_ string) bool { return false })
+	opt = opt.Filter(func(_ *string) bool { return false })
 	require.True(t, opt.IsEmpty())
 }
 
 func TestFilter_PredicateNotOkOnNilValue(t *testing.T) {
 	opt := OfNillable[string](nil)
-	opt = opt.Filter(func(_ *string) bool { return false })
+	opt = opt.Filter(func(_ **string) bool { return false })
 	require.True(t, opt.IsEmpty())
 }
 
 func TestFilter_PredicateNotOkOnNotEmpty(t *testing.T) {
 	opt := Of(123)
-	opt = opt.Filter(func(_ int) bool { return false })
+	opt = opt.Filter(func(_ *int) bool { return false })
 	require.True(t, opt.IsEmpty())
 }
 
 func TestMap_Empty(t *testing.T) {
-	opt := Map(Empty[string](), func(s string) string { return s })
+	opt := Map(Empty[string](), func(s *string) string { return *s })
 	require.True(t, opt.IsEmpty())
 }
 
@@ -248,7 +248,7 @@ func TestMap_NilMapperOnEmpty(t *testing.T) {
 }
 
 func TestMap_NotEmpty(t *testing.T) {
-	opt := Map(Of(123), func(x int) string { return fmt.Sprintf("%v", x) })
+	opt := Map(Of(123), func(x *int) string { return fmt.Sprintf("%v", *x) })
 	require.True(t, opt.IsPresent())
 	require.EqualValues(t, opt.Get(), "123")
 }
@@ -264,7 +264,7 @@ func TestMap_NilInput(t *testing.T) {
 	defer func() {
 		require.Nil(t, recover())
 	}()
-	Map(nil, func(i int) string { return "goptional" })
+	Map(nil, func(_ *int) string { return "goptional" })
 }
 
 func TestMap_NilMapperOnNilInput(t *testing.T) {
@@ -275,7 +275,7 @@ func TestMap_NilMapperOnNilInput(t *testing.T) {
 }
 
 func TestMapOr_Empty(t *testing.T) {
-	opt := MapOr(Empty[string](), func(s string) string { return s }, "default")
+	opt := MapOr(Empty[string](), func(s *string) string { return *s }, "default")
 	require.True(t, opt.IsPresent())
 	require.EqualValues(t, opt.Get(), "default")
 }
@@ -287,7 +287,7 @@ func TestMapOr_NilMapperOnEmpty(t *testing.T) {
 }
 
 func TestMapOr_NotEmpty(t *testing.T) {
-	opt := MapOr(Of(123), func(x int) string { return fmt.Sprintf("%v", x) }, "default")
+	opt := MapOr(Of(123), func(x *int) string { return fmt.Sprintf("%v", *x) }, "default")
 	require.True(t, opt.IsPresent())
 	require.EqualValues(t, opt.Get(), "123")
 }
@@ -303,7 +303,7 @@ func TestMapOr_NilInput(t *testing.T) {
 	defer func() {
 		require.Nil(t, recover())
 	}()
-	MapOr(nil, func(i int) string { return "goptional" }, "default")
+	MapOr(nil, func(_ *int) string { return "goptional" }, "default")
 }
 
 func TestMapOr_NilMapperOnNilInput(t *testing.T) {
@@ -314,7 +314,7 @@ func TestMapOr_NilMapperOnNilInput(t *testing.T) {
 }
 
 func TestMapOrElse_Empty(t *testing.T) {
-	opt := MapOrElse(Empty[string](), func(s string) string { return s }, func() string { return "default" })
+	opt := MapOrElse(Empty[string](), func(s *string) string { return *s }, func() string { return "default" })
 	require.True(t, opt.IsPresent())
 	require.EqualValues(t, opt.Get(), "default")
 }
@@ -326,7 +326,7 @@ func TestMapOrElse_NilMapperOnEmpty(t *testing.T) {
 }
 
 func TestMapOrElse_NotEmpty(t *testing.T) {
-	opt := MapOrElse(Of(123), func(x int) string { return fmt.Sprintf("%v", x) }, func() string { return "default" })
+	opt := MapOrElse(Of(123), func(x *int) string { return fmt.Sprintf("%v", *x) }, func() string { return "default" })
 	require.True(t, opt.IsPresent())
 	require.EqualValues(t, opt.Get(), "123")
 }
@@ -342,7 +342,7 @@ func TestMapOrElse_NilInput(t *testing.T) {
 	defer func() {
 		require.Nil(t, recover())
 	}()
-	MapOrElse(nil, func(i int) string { return "goptional" }, func() string { return "default" })
+	MapOrElse(nil, func(_ *int) string { return "goptional" }, func() string { return "default" })
 }
 
 func TestMapOrElse_NilMapperOnNilInput(t *testing.T) {
@@ -356,11 +356,11 @@ func TestMapOrElse_NilSupplierOnEmpty(t *testing.T) {
 	defer func() {
 		require.NotNil(t, recover())
 	}()
-	MapOrElse(Empty[string](), func(x string) int { return 0 }, nil)
+	MapOrElse(Empty[string](), func(_ *string) int { return 0 }, nil)
 }
 
 func TestFlatMap_Empty(t *testing.T) {
-	opt := FlatMap(Empty[string](), func(x string) Optional[int] { return Of(123) })
+	opt := FlatMap(Empty[string](), func(_ *string) Optional[int] { return Of(123) })
 	require.True(t, opt.IsEmpty())
 }
 
@@ -370,13 +370,13 @@ func TestFlatMap_NilMapperOnEmpty(t *testing.T) {
 }
 
 func TestFlatMap_MapToNotEmptyOnNotEmpty(t *testing.T) {
-	opt := FlatMap(Of(123), func(x int) Optional[string] { return Of(fmt.Sprintf("%v", x)) })
+	opt := FlatMap(Of(123), func(x *int) Optional[string] { return Of(fmt.Sprintf("%v", *x)) })
 	require.True(t, opt.IsPresent())
 	require.EqualValues(t, opt.Get(), "123")
 }
 
 func TestFlatMap_MapToEmptyOnNotEmpty(t *testing.T) {
-	opt := FlatMap(Of(123), func(x int) Optional[string] { return Empty[string]() })
+	opt := FlatMap(Of(123), func(_ *int) Optional[string] { return Empty[string]() })
 	require.True(t, opt.IsEmpty())
 }
 
@@ -391,7 +391,7 @@ func TestFlatMap_NilInput(t *testing.T) {
 	defer func() {
 		require.Nil(t, recover())
 	}()
-	FlatMap(nil, func(x int) Optional[string] { return Of("123") })
+	FlatMap(nil, func(_ *int) Optional[string] { return Of("123") })
 }
 
 func TestFlatMap_NilMapperOnNilInput(t *testing.T) {
