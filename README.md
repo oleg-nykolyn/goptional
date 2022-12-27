@@ -349,6 +349,26 @@ opt = opt.Xor(goptional.Of(321))
 v := opt.OrElse(0)
 ```
 
+### Mutations
+
+`Take`
+
+```go
+// TODO
+```
+
+`Replace`
+
+```go
+// TODO
+```
+
+`ReplaceWith`
+
+```go
+// TODO
+```
+
 ### String Representation
 
 `Optional` implements the `Stringer` interface and relies on [spew](https://github.com/davecgh/go-spew).
