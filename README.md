@@ -142,6 +142,27 @@ v := opt.OrElseGet(func() string {
 })
 ```
 
+`OrZero`
+
+```go
+opt := goptional.Empty[string]()
+
+// Retrieve the value held by opt or 
+// the zero value of its type otherwise.
+//
+// Some zero values:
+//  string -> ""
+//  bool -> false
+//  int -> 0
+//  ptr -> nil
+v := opt.OrZero()
+
+// Is true.
+if v == "" {
+    // ...
+}
+```
+
 `OrElsePanicWithErr`
 
 ```go
