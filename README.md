@@ -355,7 +355,7 @@ v := opt.OrElse(0)
 ```go
 opt1 := goptional.Of(123)
 
-// Take the value from opt, if there is any,
+// Take the value from opt1, if there is any,
 // transfer it to opt2 and leave opt1 empty.
 opt2 := opt1.Take()
 
@@ -373,7 +373,7 @@ v := opt2.Get()
 ```go
 opt1 := goptional.Of(123)
 
-// Replace the value of opt1 with 789 and return the old value if present.
+// Replace the value of opt1 with 789 and return the old value, if present.
 // 
 // opt1 -> 789, opt2 -> 123
 opt2 := opt1.Replace(789)
