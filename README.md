@@ -373,18 +373,23 @@ opt2 := opt1.Replace(789)
 opt := goptional.Of(123)
 
 // Get the JSON representation of opt.
-// Marshal returns []byte("null") if an Optional is empty.
+// It returns []byte("null") if called on an empty Optional.
 jsonBytes, err := opt.MarshalJSON()
+
+// Is true.
+if string(jsonBytes) == "123" {
+    // ...
+}
 ```
 
 `UnmarshalJSON`
 
 ```go
 opt := goptional.Empty[int]()
-intAsJSON := "123"
+numAsJSON := "123"
 
 // Populate opt with the given JSON.
-err := opt.UnmarshalJSON([]byte(intAsJSON))
+err := opt.UnmarshalJSON([]byte(numAsJSON))
 if err == nil {
     // v is 123
     v := opt.Get()
