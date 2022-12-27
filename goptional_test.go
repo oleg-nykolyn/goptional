@@ -663,8 +663,7 @@ func TestOrElsePanicWithErr_SuppliedNilOnEmpty(t *testing.T) {
 		require.NotNil(t, r)
 		err, ok := r.(error)
 		require.True(t, ok)
-		require.Error(t, err)
-		require.EqualError(t, err, noValueErrMsg)
+		require.ErrorIs(t, err, ErrNoValue)
 	}()
 	Empty[string]().OrElsePanicWithErr(func() error { return nil })
 }

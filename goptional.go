@@ -15,6 +15,7 @@ import (
 )
 
 // Optional represents an optional value.
+// At any time it can either hold a value or be empty.
 type Optional[T any] struct {
 	wrappedValue *valueWrapper[T]
 }
@@ -23,7 +24,8 @@ type valueWrapper[T any] struct {
 	value T
 }
 
-const noValueErrMsg = "no value present"
+// ErrNoValue is an error that is returned when attempting to retrieve a value from an empty Optional.
+var ErrNoValue = errors.New("no value present")
 
 // Empty returns a new empty Optional.
 func Empty[T any]() *Optional[T] {
@@ -65,7 +67,7 @@ func (o *Optional[T]) IsEmpty() bool {
 // It panics if this instance is empty.
 func (o *Optional[T]) Get() T {
 	if o.IsEmpty() {
-		panic(noValueErrMsg)
+		panic(ErrNoValue)
 	}
 	return o.wrappedValue.value
 }
@@ -224,10 +226,12 @@ func (o *Optional[T]) OrElsePanicWithErr(supplier func() error) T {
 	if o.IsEmpty() {
 		err := supplier()
 		if err == nil {
-			panic(errors.New(noValueErrMsg))
+			panic(ErrNoValue)
 		} else {
 			panic(err)
 		}
 	}
 	return o.Get()
 }
+
+// return spew.Sprintf("Optional[%#+v]", t)
