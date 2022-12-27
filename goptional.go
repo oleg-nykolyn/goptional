@@ -266,24 +266,12 @@ func (o *Optional[T]) Take() Optional[T] {
 // returning the old value if present, leaving a non-empty Optional in its place
 // without deinitializing either one.
 func (o *Optional[T]) Replace(value T) Optional[T] {
+	inOpt := Of(value)
 	if o.IsEmpty() {
-		return *o
+		*o = inOpt
+		return Empty[T]()
 	}
 	v := o.Get()
-	*o = Of(value)
-	return Of(v)
-}
-
-// ReplaceWith replaces the value in this instance with the value provided by the given supplier,
-// returning the old value if present, leaving a non-empty Optional in its place
-// without deinitializing either one.
-//
-// It panics if this instance is not empty and supplier is nil.
-func (o *Optional[T]) ReplaceWith(supplier func() T) Optional[T] {
-	if o.IsEmpty() {
-		return *o
-	}
-	v := o.Get()
-	*o = Of(supplier())
+	*o = inOpt
 	return Of(v)
 }

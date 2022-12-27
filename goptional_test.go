@@ -712,7 +712,7 @@ func TestReplace_Empty(t *testing.T) {
 	opt := Empty[int]()
 	opt2 := opt.Replace(321)
 
-	require.True(t, opt.IsEmpty())
+	require.EqualValues(t, opt.Get(), 321)
 	require.True(t, opt2.IsEmpty())
 }
 
@@ -728,34 +728,4 @@ func TestReplace_NotEmpty(t *testing.T) {
 
 	require.True(t, opt2.IsPresent())
 	require.EqualValues(t, opt2.Get(), meh)
-}
-
-func TestReplaceWith_Empty(t *testing.T) {
-	opt := Empty[int]()
-	opt2 := opt.ReplaceWith(func() int { return 321 })
-
-	require.True(t, opt.IsEmpty())
-	require.True(t, opt2.IsEmpty())
-}
-
-func TestReplaceWith_NotEmpty(t *testing.T) {
-	meh := 123
-	lfg := 69_420
-
-	opt := Of(meh)
-	opt2 := opt.ReplaceWith(func() int { return lfg })
-
-	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), lfg)
-
-	require.True(t, opt2.IsPresent())
-	require.EqualValues(t, opt2.Get(), meh)
-}
-
-func TestReplaceWith_NilSupplierOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	opt := Of(123)
-	opt.ReplaceWith(nil)
 }

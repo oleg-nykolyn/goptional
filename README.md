@@ -354,19 +354,35 @@ v := opt.OrElse(0)
 `Take`
 
 ```go
-// TODO
+opt1 := goptional.Of(123)
+
+// Take the value from opt, if there is any,
+// transfer it to opt2 and leave opt1 empty.
+opt2 := opt1.Take()
+
+// Is true.
+if opt1.IsEmpty() {
+    // ...
+}
+
+// v is 123
+v := opt2.Get()
 ```
 
 `Replace`
 
 ```go
-// TODO
+opt1 := goptional.Of(123)
+
+// opt1 -> 789, opt2 -> 123
+opt2 := opt1.Replace(789)
 ```
 
-`ReplaceWith`
-
 ```go
-// TODO
+opt1 := goptional.Empty[int]()
+
+// opt1 -> 789, opt2 -> Empty
+opt2 := opt1.Replace(789)
 ```
 
 ### String Representation
