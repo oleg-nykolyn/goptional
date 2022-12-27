@@ -818,3 +818,79 @@ func TestUnmarshalJSON_ValidDataOnNotEmpty(t *testing.T) {
 	require.True(t, opt.IsPresent())
 	require.EqualValues(t, opt.Get(), sampleStructInst)
 }
+
+func TestFlatten_Empty(t *testing.T) {
+	require.True(t, Flatten(Empty[Optional[int]]()).IsEmpty())
+}
+
+func TestFlatten_NotEmpty(t *testing.T) {
+	opt := Flatten(Of(Of(123)))
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), 123)
+}
+
+func TestZip_Empty(t *testing.T) {
+	require.True(t, Zip(Empty[int](), Empty[string]()).IsEmpty())
+	require.True(t, Zip(Of(123), Empty[string]()).IsEmpty())
+	require.True(t, Zip(Empty[int](), Of("gm")).IsEmpty())
+}
+
+func TestZip_BothNotEmpty(t *testing.T) {
+	opt := Zip(Of(123), Of("gm"))
+	require.True(t, opt.IsPresent())
+
+	v := opt.Get()
+	require.EqualValues(t, v.First, 123)
+	require.EqualValues(t, v.Second, "gm")
+}
+
+func TestUnzip_Empty(t *testing.T) {
+	o1, o2 := Unzip(Empty[*Pair[Optional[int], Optional[string]]]())
+	require.True(t, o1.IsEmpty())
+	require.True(t, o2.IsEmpty())
+}
+
+func TestUnzip_BothNotEmpty(t *testing.T) {
+	pair := &Pair[Optional[int], Optional[string]]{First: Of(123), Second: Of("gm")}
+	o1, o2 := Unzip(Of(pair))
+
+	require.True(t, o1.IsPresent())
+	require.EqualValues(t, o1, pair.First)
+
+	require.True(t, o2.IsPresent())
+	require.EqualValues(t, o2, pair.Second)
+
+}
+
+func TestUnzip_LeftEmpty(t *testing.T) {
+	pair := &Pair[Optional[int], Optional[string]]{First: Empty[int](), Second: Of("gm")}
+	o1, o2 := Unzip(Of(pair))
+
+	require.True(t, o1.IsEmpty())
+	require.EqualValues(t, o1, pair.First)
+
+	require.True(t, o2.IsPresent())
+	require.EqualValues(t, o2, pair.Second)
+}
+
+func TestUnzip_RightEmpty(t *testing.T) {
+	pair := &Pair[Optional[int], Optional[string]]{First: Of(123), Second: Empty[string]()}
+	o1, o2 := Unzip(Of(pair))
+
+	require.True(t, o1.IsPresent())
+	require.EqualValues(t, o1, pair.First)
+
+	require.True(t, o2.IsEmpty())
+	require.EqualValues(t, o2, pair.Second)
+}
+
+func TestUnzip_BothEmpty(t *testing.T) {
+	pair := &Pair[Optional[int], Optional[string]]{First: Empty[int](), Second: Empty[string]()}
+	o1, o2 := Unzip(Of(pair))
+
+	require.True(t, o1.IsEmpty())
+	require.EqualValues(t, o1, pair.First)
+
+	require.True(t, o2.IsEmpty())
+	require.EqualValues(t, o2, pair.Second)
+}
