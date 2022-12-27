@@ -2,7 +2,7 @@
 
 [![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
 
-Yet *another* implementation of the `Optional` type in Go 🫡
+🦄 A *comprehensive* implementation of the `Optional` type in Go
 
 ## Features
 
