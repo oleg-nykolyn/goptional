@@ -736,7 +736,7 @@ type sampleStruct struct {
 	Z []string `json:"z"`
 }
 
-var sampleStructInst = sampleStruct{
+var sampleStructInst = &sampleStruct{
 	X: "gmgn",
 	Y: true,
 	Z: []string{"a", "b", "c"},
@@ -804,7 +804,7 @@ func TestUnmarshalJSON_ValidDataOnEmpty(t *testing.T) {
 	err := opt.UnmarshalJSON([]byte(sampleJSON))
 	require.NoError(t, err)
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), &sampleStructInst)
+	require.EqualValues(t, opt.Get(), sampleStructInst)
 }
 
 func TestUnmarshalJSON_ValidDataOnNotEmpty(t *testing.T) {
@@ -816,7 +816,7 @@ func TestUnmarshalJSON_ValidDataOnNotEmpty(t *testing.T) {
 	err := opt.UnmarshalJSON([]byte(sampleJSON))
 	require.NoError(t, err)
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), sampleStructInst)
+	require.EqualValues(t, opt.Get(), *sampleStructInst)
 }
 
 func TestFlatten_Empty(t *testing.T) {
