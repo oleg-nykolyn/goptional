@@ -2,7 +2,7 @@
 
 [![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
 
-Yet another implementation of the Optional type in Go 🫠
+Yet *another* implementation of the `Optional` type in Go 🫡
 
 ## Features
 
@@ -29,26 +29,52 @@ import "github.com/nykolynoleg/goptional"
 
 ### Creation
 
+`Of`
+
 ```go
 // Create an Optional of type int that holds 123.
 // All value and reference types are supported.
 opt := goptional.Of(123)
 ```
 
+`Empty`
+> ✍🏼 Note that an empty `Optional` is effectively a `nil` pointer.  
+> Regardless, you can **safely** call any methods on it without expecting a nullptr `panic`.
+
 ```go
 // Create an empty Optional of type string.
 opt := goptional.Empty[string]()
+
+// Is true.
+if opt == nil {
+
+}
+
+// Will not panic.
+if opt.IsPresent() {
+    // ...
+}
 ```
 
-```go
-// 'Of' returns an empty Optional if its argument is nil.
-opt := goptional.Of[[]string](nil)
-```
+`OfNillable`
 
 ```go
-// Note that if the argument is the zero value of a value type,
-// such as "", false, 0 then a non-empty Optional is returned instead.
-opt := goptional.Of("")
+// Create an Optional of type *string that holds the address of s.
+s := "gm goptional"
+opt := goptional.OfNillable[string](&s)
+
+// Is true.
+if opt.IsPresent() {
+    // ...
+}
+
+// If the argument to OfNillable is nil, an empty Optional is returned instead.
+opt2 := goptional.OfNillable[string](nil)
+
+// Is false.
+if opt2.IsPresent() {
+    // ...
+}
 ```
 
 ### Presence Checks
@@ -64,6 +90,20 @@ if opt.IsPresent() {
 
 // Check if opt has no value.
 if opt.IsEmpty() {
+    // ...
+}
+```
+
+### Equality Check
+
+```go
+opt := goptional.Of(123)
+opt2 := goptional.Of(321)
+
+// Compare opt & opt2 for equality.
+// It returns true if both contain the same value, or if both are empty.
+// Otherwise, it returns false.
+if opt.Equals(opt2) {
     // ...
 }
 ```
@@ -285,6 +325,10 @@ opt = opt.Xor(goptional.Of(321))
 // v is 321
 v := opt.OrElse(0)
 ```
+
+### String Representation
+
+`Optional` implements the `Stringer` interface and relies on [spew](https://github.com/davecgh/go-spew).
 
 ## Testing
 
