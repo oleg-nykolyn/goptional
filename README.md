@@ -35,7 +35,6 @@ import "github.com/nykolynoleg/goptional"
 
 ```go
 // Create an Optional of type int that holds 123.
-// All value and reference types are supported.
 opt := goptional.Of(123)
 ```
 
@@ -79,7 +78,7 @@ if opt2.IsPresent() {
 }
 ```
 
-### Presence Checks
+### Presence
 
 ```go
 opt := goptional.Of(123)
@@ -96,7 +95,7 @@ if opt.IsEmpty() {
 }
 ```
 
-### Equality Check
+### Equality
 
 ```go
 opt := goptional.Of(123)
@@ -374,6 +373,8 @@ v := opt2.Get()
 ```go
 opt1 := goptional.Of(123)
 
+// Replace the value of opt1 with 789 and return the old value if present.
+// 
 // opt1 -> 789, opt2 -> 123
 opt2 := opt1.Replace(789)
 ```
@@ -383,6 +384,32 @@ opt1 := goptional.Empty[int]()
 
 // opt1 -> 789, opt2 -> Empty
 opt2 := opt1.Replace(789)
+```
+
+### JSON
+
+`MarshalJSON`
+
+```go
+opt := goptional.Of(123)
+
+// Get the JSON representation of opt.
+// If opt is empty, []byte("null") is returned.
+jsonBytes, err := opt.MarshalJSON()
+```
+
+`UnmarshalJSON`
+
+```go
+opt := goptional.Empty[int]()
+intAsJSON := "123"
+
+// Populate opt with the given JSON.
+err := opt.UnmarshalJSON([]byte(intAsJSON))
+if err == nil {
+    // v is 123
+    v := opt.Get()
+}
 ```
 
 ### String Representation

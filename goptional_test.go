@@ -729,3 +729,92 @@ func TestReplace_NotEmpty(t *testing.T) {
 	require.True(t, opt2.IsPresent())
 	require.EqualValues(t, opt2.Get(), meh)
 }
+
+type sampleStruct struct {
+	X string   `json:"x"`
+	Y bool     `json:"y"`
+	Z []string `json:"z"`
+}
+
+var sampleStructInst = sampleStruct{
+	X: "gmgn",
+	Y: true,
+	Z: []string{"a", "b", "c"},
+}
+
+const sampleJSON = `{"x":"gmgn","y":true,"z":["a","b","c"]}`
+
+func TestMarshalJSON_Empty(t *testing.T) {
+	jsonBytes, err := Empty[int]().MarshalJSON()
+	require.NoError(t, err)
+	require.EqualValues(t, jsonBytes, nilAsJSON)
+}
+
+func TestMarshalJSON_NotEmpty(t *testing.T) {
+	jsonBytes, err := Of("gmgn").MarshalJSON()
+	require.NoError(t, err)
+	require.EqualValues(t, jsonBytes, []byte("\"gmgn\""))
+
+	jsonBytes, err = Of(true).MarshalJSON()
+	require.NoError(t, err)
+	require.EqualValues(t, jsonBytes, []byte("true"))
+
+	jsonBytes, err = Of(sampleStructInst).MarshalJSON()
+	require.NoError(t, err)
+	require.EqualValues(t, jsonBytes, []byte(sampleJSON))
+}
+
+func TestUnmarshalJSON_NoDataOnEmpty(t *testing.T) {
+	opt := Empty[int]()
+	err := opt.UnmarshalJSON(nil)
+	require.NoError(t, err)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestUnmarshalJSON_NullDataOnEmpty(t *testing.T) {
+	opt := Empty[int]()
+	err := opt.UnmarshalJSON(nilAsJSON)
+	require.NoError(t, err)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestUnmarshalJSON_NoDataOnNotEmpty(t *testing.T) {
+	opt := Of(123)
+	err := opt.UnmarshalJSON(nil)
+	require.NoError(t, err)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestUnmarshalJSON_NullDataOnNotEmpty(t *testing.T) {
+	opt := Of(123)
+	err := opt.UnmarshalJSON(nilAsJSON)
+	require.NoError(t, err)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestUnmarshalJSON_InvalidData(t *testing.T) {
+	opt := Empty[*sampleStruct]()
+	err := opt.UnmarshalJSON([]byte(sampleJSON)[1:])
+	require.Error(t, err)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestUnmarshalJSON_ValidDataOnEmpty(t *testing.T) {
+	opt := Empty[*sampleStruct]()
+	err := opt.UnmarshalJSON([]byte(sampleJSON))
+	require.NoError(t, err)
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), &sampleStructInst)
+}
+
+func TestUnmarshalJSON_ValidDataOnNotEmpty(t *testing.T) {
+	s := sampleStruct{
+		X: "diff",
+		Z: nil,
+	}
+	opt := Of(s)
+	err := opt.UnmarshalJSON([]byte(sampleJSON))
+	require.NoError(t, err)
+	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.Get(), sampleStructInst)
+}
