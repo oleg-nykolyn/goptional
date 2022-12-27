@@ -1,11 +1,6 @@
 /*
 Package goptional implements the Optional type, its methods and functions.
-
-The API is heavily inspired by Java, specifically https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/util/Optional.java –
-with some additions inspired by Rust, such as MapOr, MapOrElse & Xor.
-
-The family of map-like operators is implemented through functions
-due to Go's absence of method-level type parameters. This might change in the future.
+The API is heavily inspired by the Java & Rust implementations.
 */
 package goptional
 

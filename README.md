@@ -332,6 +332,11 @@ v := opt.OrElse(0)
 
 `Optional` implements the `Stringer` interface and relies on [spew](https://github.com/davecgh/go-spew).
 
+##  FAQ
+
+1. **Why are `Map`, `MapOr`, etc. implemented as functions and not methods of the `Optional` type?**  
+As of now, Go does **not** support method-level type parameters. This might change in the future.
+
 ## Testing
 
 ```bash
