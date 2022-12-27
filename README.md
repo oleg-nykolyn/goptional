@@ -35,7 +35,6 @@ import "github.com/nykolynoleg/goptional"
 
 ```go
 // Create an Optional of type int that holds 123.
-// All value and reference types are supported.
 opt := goptional.Of(123)
 ```
 
@@ -79,7 +78,7 @@ if opt2.IsPresent() {
 }
 ```
 
-### Presence Checks
+### Presence
 
 ```go
 opt := goptional.Of(123)
@@ -96,7 +95,7 @@ if opt.IsEmpty() {
 }
 ```
 
-### Equality Check
+### Equality
 
 ```go
 opt := goptional.Of(123)

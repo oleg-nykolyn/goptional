@@ -729,3 +729,33 @@ func TestReplace_NotEmpty(t *testing.T) {
 	require.True(t, opt2.IsPresent())
 	require.EqualValues(t, opt2.Get(), meh)
 }
+
+func TestMarshalJSON_Empty(t *testing.T) {
+	json, err := Empty[int]().MarshalJSON()
+	require.NoError(t, err)
+	require.EqualValues(t, json, nilAsJSON)
+}
+
+func TestMarshalJSON_NotEmpty(t *testing.T) {
+	bytes, err := Of("gmgn").MarshalJSON()
+	require.NoError(t, err)
+	require.EqualValues(t, bytes, []byte("\"gmgn\""))
+
+	bytes, err = Of(true).MarshalJSON()
+	require.NoError(t, err)
+	require.EqualValues(t, bytes, []byte("true"))
+
+	type S struct {
+		X string   `json:"x"`
+		Y bool     `json:"y"`
+		Z []string `json:"z"`
+	}
+
+	bytes, err = Of(S{
+		X: "gmgn",
+		Y: true,
+		Z: []string{"a", "b", "c"},
+	}).MarshalJSON()
+	require.NoError(t, err)
+	require.EqualValues(t, bytes, []byte(`{"x":"gmgn","y":true,"z":["a","b","c"]}`))
+}
