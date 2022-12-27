@@ -5,6 +5,8 @@ The API is heavily inspired by the Java & Rust implementations.
 package goptional
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"reflect"
 
@@ -242,6 +244,33 @@ func (o Optional[T]) Equals(o2 Optional[T]) bool {
 		return reflect.DeepEqual(o.Get(), o2.Get())
 	}
 	return false
+}
+
+var nilAsJSON = []byte("null")
+
+// MarshalJSON returns the JSON representation of this instance.
+func (o Optional[T]) MarshalJSON() ([]byte, error) {
+	if o.IsEmpty() {
+		return nilAsJSON, nil
+	}
+	return json.Marshal(o.Get())
+}
+
+// UnmarshalJSON attempts to populate this instance with the given JSON data.
+func (o *Optional[T]) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 || bytes.Equal(data, nilAsJSON) {
+		*o = Empty[T]()
+		return nil
+	}
+
+	var val T
+	err := json.Unmarshal(data, &val)
+	if err != nil {
+		return err
+	}
+	*o = Of(val)
+
+	return nil
 }
 
 // String returns the string representation of this instance.
