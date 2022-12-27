@@ -67,10 +67,6 @@ func (o Optional[T]) Get() T {
 	if o.IsEmpty() {
 		panic(ErrNoValue)
 	}
-	return o.get()
-}
-
-func (o Optional[T]) get() T {
 	return o[0]
 }
 
@@ -230,12 +226,12 @@ func (o Optional[T]) OrElsePanicWithErr(supplier func() error) T {
 // Equals compares two Optionals for equality.
 // It returns true if both Optionals contain the same value, or if both Optionals are empty.
 // Otherwise, it returns false.
-func (o Optional[T]) Equals(opt2 Optional[T]) bool {
-	if !o.IsPresent() && !opt2.IsPresent() {
+func (o Optional[T]) Equals(o2 Optional[T]) bool {
+	if !o.IsPresent() && !o2.IsPresent() {
 		return true
 	}
-	if o.IsPresent() && opt2.IsPresent() {
-		return reflect.DeepEqual(o.Get(), opt2.Get())
+	if o.IsPresent() && o2.IsPresent() {
+		return reflect.DeepEqual(o.Get(), o2.Get())
 	}
 	return false
 }

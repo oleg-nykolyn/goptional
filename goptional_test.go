@@ -17,7 +17,7 @@ func TestEmpty(t *testing.T) {
 func TestOf_ValidValue(t *testing.T) {
 	opt := Of(123)
 	require.NotEmpty(t, opt)
-	require.EqualValues(t, opt.get(), 123)
+	require.EqualValues(t, opt[0], 123)
 }
 
 func TestOf_InvalidValue(t *testing.T) {
@@ -46,7 +46,7 @@ func TestOfNillable_NotNilValue(t *testing.T) {
 	v := []int{1, 2, 3}
 	opt := OfNillable(&v)
 	require.NotEmpty(t, opt)
-	require.EqualValues(t, opt.get(), &v)
+	require.EqualValues(t, opt[0], &v)
 }
 
 func TestIsPresent_Empty(t *testing.T) {
