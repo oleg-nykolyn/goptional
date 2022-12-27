@@ -374,6 +374,8 @@ v := opt2.Get()
 ```go
 opt1 := goptional.Of(123)
 
+// Replace opt1's value with 789 and return the old value, if present, as an Optional.
+// 
 // opt1 -> 789, opt2 -> 123
 opt2 := opt1.Replace(789)
 ```
