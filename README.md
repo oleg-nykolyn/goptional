@@ -355,8 +355,8 @@ v := opt.OrElse(0)
 ```go
 opt1 := goptional.Of(123)
 
-// Take the value from opt1, if there is any,
-// transfer it to opt2 and leave opt1 empty.
+// Take the value from opt1, if any,
+// and transfer it to opt2 by leaving opt1 empty.
 opt2 := opt1.Take()
 
 // Is true.
@@ -373,8 +373,6 @@ v := opt2.Get()
 ```go
 opt1 := goptional.Of(123)
 
-// Replace the value of opt1 with 789 and return the old value, if present.
-// 
 // opt1 -> 789, opt2 -> 123
 opt2 := opt1.Replace(789)
 ```
@@ -394,7 +392,7 @@ opt2 := opt1.Replace(789)
 opt := goptional.Of(123)
 
 // Get the JSON representation of opt.
-// If opt is empty, []byte("null") is returned.
+// []byte("null") is returned for any empty Optional.
 jsonBytes, err := opt.MarshalJSON()
 ```
 
