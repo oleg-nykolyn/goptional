@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -650,4 +651,22 @@ func TestEquals_NotEqualValuesComposite(t *testing.T) {
 	opt1 := Of(v)
 	opt2 := Of(v2)
 	require.False(t, opt1.Equals(opt2))
+}
+
+func TestOrZero_Empty(t *testing.T) {
+	assert.EqualValues(t, Empty[string]().OrZero(), "")
+	assert.False(t, Empty[bool]().OrZero())
+	assert.Nil(t, Empty[*string]().OrZero())
+	assert.EqualValues(t, Empty[int]().OrZero(), 0)
+	assert.Nil(t, Empty[[]string]().OrZero())
+}
+
+func TestOrZero_NotEmpty(t *testing.T) {
+	assert.EqualValues(t, Of("abc").OrZero(), "abc")
+	assert.True(t, Of(true).OrZero())
+	s := "abc"
+	assert.EqualValues(t, Of(&s).OrZero(), &s)
+	assert.EqualValues(t, Of(123).OrZero(), 123)
+	v := []string{"a", "b", "c"}
+	assert.EqualValues(t, Of(v).OrZero(), v)
 }
