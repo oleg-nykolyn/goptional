@@ -233,7 +233,7 @@ opt := Of(123)
 
 // FlatMap is similar to Map, but the given supplier returns an Optional instead.
 // If you are familiar with Monads, think of it as AndThen.
-strOpt := FlatMap(opt, func(v int) *Optional[string] {
+strOpt := FlatMap(opt, func(v int) Optional[string] {
     return Of(fmt.Sprintf("%v_mapped", v))
 })
 
@@ -245,7 +245,7 @@ v := strOpt.OrElse("")
 opt := Empty[int]()
 
 // Returns a new empty Optional of the target type, as opt is empty.
-strOpt := FlatMap(opt, func(v int) *Optional[string] {
+strOpt := FlatMap(opt, func(v int) Optional[string] {
     return Of(fmt.Sprintf("%v_mapped", v))
 })
 
@@ -292,7 +292,7 @@ opt.IfPresentOrElse(func(v int) {
 opt := goptional.Empty[int]()
 
 // AND between opt & the supplied Optional.
-opt = opt.And(func() *Optional[int] {
+opt = opt.And(func() Optional[int] {
     return goptional.Of(123)
 })
 
@@ -306,7 +306,7 @@ v := opt.OrElse(0)
 opt := goptional.Empty[int]()
 
 // OR between opt & the supplied Optional.
-opt = opt.Or(func() *Optional[int] {
+opt = opt.Or(func() Optional[int] {
     return goptional.Of(123)
 })
 
