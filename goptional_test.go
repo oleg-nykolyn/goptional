@@ -670,3 +670,40 @@ func TestOrZero_NotEmpty(t *testing.T) {
 	v := []string{"a", "b", "c"}
 	assert.EqualValues(t, Of(v).OrZero(), v)
 }
+
+func TestTake_Empty(t *testing.T) {
+	var opt Optional[int]
+	opt2 := opt.Take()
+	require.True(t, opt.IsEmpty())
+	require.True(t, opt2.IsEmpty())
+}
+
+func TestTake_Nil(t *testing.T) {
+	opt := OfNillable[string](nil)
+	opt2 := opt.Take()
+	require.True(t, opt.IsEmpty())
+	require.True(t, opt2.IsEmpty())
+}
+
+func TestTake_NotEmpty(t *testing.T) {
+	opt := Of(123)
+	opt2 := opt.Take()
+
+	require.Nil(t, opt)
+	require.True(t, opt.IsEmpty())
+
+	require.True(t, opt2.IsPresent())
+	require.EqualValues(t, opt2.Get(), 123)
+}
+
+func TestTake_Nillable(t *testing.T) {
+	v := []interface{}{"a", 123, 321, false, []string{}, nil}
+	opt := OfNillable(&v)
+	opt2 := opt.Take()
+
+	require.Nil(t, opt)
+	require.True(t, opt.IsEmpty())
+
+	require.True(t, opt2.IsPresent())
+	require.EqualValues(t, opt2.Get(), &v)
+}

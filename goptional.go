@@ -251,3 +251,13 @@ func (o Optional[T]) String() string {
 	}
 	return spew.Sprintf("Optional[%#+v]", o.Get())
 }
+
+// Take takes the value out of this instance, if there is any, leaving an empty Optional in its place.
+func (o *Optional[T]) Take() Optional[T] {
+	if o.IsEmpty() {
+		return *o
+	}
+	v := o.Get()
+	*o = nil
+	return Of(v)
+}
