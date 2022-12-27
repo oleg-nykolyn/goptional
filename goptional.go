@@ -304,3 +304,45 @@ func (o *Optional[T]) Replace(value T) Optional[T] {
 	*o = inOpt
 	return Of(v)
 }
+
+// Pair is your usual generic pair.
+type Pair[X, Y any] struct {
+	// First is the first element of the pair.
+	First X
+	// Second is the second element of the pair.
+	Second Y
+}
+
+// Zip zips o1 with o2.
+// If o1 and o2 are both non-empty, it returns an optional pair holding the value of o1 & o2.
+//
+// Otherwise, an empty Optional is returned.
+func Zip[X, Y any](o1 Optional[X], o2 Optional[Y]) Optional[*Pair[X, Y]] {
+	if o1.IsPresent() && o2.IsPresent() {
+		return Of(&Pair[X, Y]{First: o1.Get(), Second: o2.Get()})
+	}
+	return Empty[*Pair[X, Y]]()
+}
+
+// Unzip unzips o containing a tuple of two Optionals.
+// If o is empty, it returns the unwrapped pair. Otherwise, two empty Optionals are returned.
+func Unzip[X, Y any](o Optional[*Pair[Optional[X], Optional[Y]]]) (Optional[X], Optional[Y]) {
+	if o.IsPresent() {
+		pair := o.Get()
+		return pair.First, pair.Second
+	}
+	return Empty[X](), Empty[Y]()
+}
+
+// ZipWith zips o1 with o2.
+// If o1 and o2 are both non-empty, it returns an Optional with a value
+// that results from the application of the given mapper to the value of o1 & o2.
+// Otherwise, an empty Optional is returned.
+//
+// It panics if o1 & o2 are both non-empty and mapper is nil.
+func ZipWith[X, Y, Z any](o1 Optional[X], o2 Optional[Y], mapper func(X, Y) Z) Optional[Z] {
+	if o1.IsPresent() && o2.IsPresent() {
+		return Of(mapper(o1.Get(), o2.Get()))
+	}
+	return Empty[Z]()
+}
