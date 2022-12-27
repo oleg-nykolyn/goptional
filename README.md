@@ -419,13 +419,6 @@ if err == nil {
 1. **Why are `Map`, `MapOr`, etc. implemented as functions and not methods?**  
 As of now, Go does **not** support method-level type parameters. This might change in the future.
 
-## TODOs
-
-- [ ] `Zip`
-- [ ] `ZipWith`
-- [ ] `Unzip`
-- [ ] `UnzipWith`
-
 ## Testing
 
 ```bash

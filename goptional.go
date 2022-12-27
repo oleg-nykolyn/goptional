@@ -360,3 +360,11 @@ func ZipWith[X, Y, Z any](o1 Optional[X], o2 Optional[Y], mapper func(*X, *Y) Z)
 	}
 	return Empty[Z]()
 }
+
+// Flatten flattens the given optional.
+func Flatten[T any](o Optional[Optional[T]]) Optional[T] {
+	if o.IsPresent() {
+		return o.Get()
+	}
+	return Empty[T]()
+}
