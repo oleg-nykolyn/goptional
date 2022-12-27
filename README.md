@@ -8,7 +8,9 @@
 
 - A recognizablle API that is *heavily* inspired by the Java & Rust implementations
 - Compatibility with all *value* and *reference* types
-- *Chainable* generic methods and functions
+- Chainable and expressive [generic methods and functions](https://go.dev/doc/tutorial/generics)
+- Minimal overhead - no structs, `Optional` is just a singleton slice
+- Null safety *by design*
 
 ## Installation
 
