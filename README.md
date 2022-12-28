@@ -39,7 +39,7 @@ opt := goptional.Of(123)
 // 💡 Return an empty Optional if the argument to Of is either nil or invalid.
 opt2 := goptional.Of[[]string](nil)
 
-fmt.Println(opt2.IsEmpty()) // false
+fmt.Println(opt2.IsEmpty()) // true
 ```
 
 `Empty`
