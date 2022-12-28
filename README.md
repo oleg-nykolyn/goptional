@@ -1,6 +1,6 @@
 # goptional
 
-[![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
+[![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Go Report Card][rep-img]][rep]
 
 A *comprehensive* implementation of the `Optional` type in Go 🚀
 
@@ -156,6 +156,16 @@ opt2 := goptional.Empty[int]()
 fmt.Println(opt2.Get()) // panics
 ```
 
+`OrDefault`
+
+```go
+opt := goptional.Empty[string]()
+
+// Retrieve the value held by opt, if any, or 
+// the zero value of the string type.
+fmt.Println(opt.OrDefault()) // ""
+```
+
 `OrElse`
 
 ```go
@@ -176,16 +186,6 @@ v := opt.OrElseGet(func() string {
 })
 
 fmt.Println(v) // gm
-```
-
-`OrDefault`
-
-```go
-opt := goptional.Empty[string]()
-
-// Retrieve the value held by opt, if any, or 
-// the zero value of its type otherwise.
-fmt.Println(opt.OrDefault()) // ""
 ```
 
 `OrPanicWith`
@@ -568,3 +568,5 @@ Released under the [MIT license](LICENSE.txt).
 [ci]: https://github.com/nykolynoleg/goptional/actions/workflows/go.yml
 [cov-img]: https://codecov.io/gh/nykolynoleg/goptional/branch/master/graph/badge.svg
 [cov]: https://codecov.io/gh/nykolynoleg/goptional
+[rep-img]: https://goreportcard.com/badge/github.com/nykolynoleg/goptional
+[rep]: https://goreportcard.com/report/github.com/nykolynoleg/goptional
