@@ -358,14 +358,14 @@ fmt.Println(opt2.IsEmpty()) // true
 opt := goptional.Of(123)
 
 // Get the JSON representation of opt.
-// It returns []byte("null") if called on an empty Optional.
 jsonBytes, err := opt.MarshalJSON()
 
 fmt.Println(err == nil)        // true
 fmt.Println(string(jsonBytes)) // 123
 
-// Make opt empty.
+// Reassign opt to empty.
 opt = goptional.Empty[int]()
+// Return []byte("null") as opt is empty.
 jsonBytes, err = opt.MarshalJSON()
 
 fmt.Println(err == nil)        // true
