@@ -73,7 +73,7 @@ func TestIsEmpty_ZeroValue(t *testing.T) {
 func TestUnwrap_NotEmpty(t *testing.T) {
 	s := "goptional"
 	opt := Of(s)
-	require.EqualValues(t, opt.Get(), s)
+	require.EqualValues(t, opt.Unwrap(), s)
 }
 
 func TestUnwrap_Empty(t *testing.T) {
@@ -83,7 +83,7 @@ func TestUnwrap_Empty(t *testing.T) {
 		require.ErrorIs(t, r.(error), ErrNoValue)
 	}()
 	opt := Empty[string]()
-	_ = opt.Get()
+	_ = opt.Unwrap()
 }
 
 func TestUnwrap_NilValue(t *testing.T) {
@@ -93,7 +93,7 @@ func TestUnwrap_NilValue(t *testing.T) {
 		require.ErrorIs(t, r.(error), ErrNoValue)
 	}()
 	opt := Of[*string](nil)
-	_ = opt.Get()
+	_ = opt.Unwrap()
 }
 
 func TestIfPresent_NotEmpty(t *testing.T) {
@@ -122,9 +122,6 @@ func TestIfPresent_NilActionOnEmpty(t *testing.T) {
 }
 
 func TestIfPresent_NilActionOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
 	Of([]string{"a", "b", "c"}).IfPresent(nil)
 }
 
@@ -150,23 +147,14 @@ func TestIfPresentOrElse_NotEmpty(t *testing.T) {
 }
 
 func TestIfPresentOrElse_NilActionOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
 	Of(123).IfPresentOrElse(nil, func() {})
 }
 
 func TestIfPresentOrElse_NilEmptyActionOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
 	Empty[string]().IfPresentOrElse(func(_ *string) {}, nil)
 }
 
 func TestIfPresentOrElse_NilEmptyActionOnNilValue(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
 	Of[*string](nil).IfPresentOrElse(func(_ **string) {}, nil)
 }
 
@@ -193,10 +181,8 @@ func TestFilter_NilPredicateOnEmpty(t *testing.T) {
 }
 
 func TestFilter_NilPredicateOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Of(123).Filter(nil)
+	opt := Of(123).Filter(nil)
+	require.True(t, opt.IsEmpty())
 }
 
 func TestFilter_PredicateNotOkOnEmpty(t *testing.T) {
@@ -230,14 +216,11 @@ func TestMap_NilMapperOnEmpty(t *testing.T) {
 func TestMap_NotEmpty(t *testing.T) {
 	opt := Map(Of(123), func(x *int) string { return fmt.Sprintf("%v", *x) })
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), "123")
+	require.EqualValues(t, opt.Unwrap(), "123")
 }
 
 func TestMap_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Map[int, string](Of(123), nil)
+	require.True(t, Map[int, string](Of(123), nil).IsEmpty())
 }
 
 func TestMap_NilInput(t *testing.T) {
@@ -257,26 +240,23 @@ func TestMap_NilMapperOnNilInput(t *testing.T) {
 func TestMapOr_Empty(t *testing.T) {
 	opt := MapOr(Empty[string](), func(s *string) string { return *s }, "default")
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), "default")
+	require.EqualValues(t, opt.Unwrap(), "default")
 }
 
 func TestMapOr_NilMapperOnEmpty(t *testing.T) {
 	opt := MapOr[string, interface{}](Empty[string](), nil, "default")
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), "default")
+	require.EqualValues(t, opt.Unwrap(), "default")
 }
 
 func TestMapOr_NotEmpty(t *testing.T) {
 	opt := MapOr(Of(123), func(x *int) string { return fmt.Sprintf("%v", *x) }, "default")
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), "123")
+	require.EqualValues(t, opt.Unwrap(), "123")
 }
 
 func TestMapOr_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	MapOr(Of(123), nil, "default")
+	require.True(t, MapOr(Of(123), nil, "default").IsEmpty())
 }
 
 func TestMapOr_NilInput(t *testing.T) {
@@ -296,26 +276,23 @@ func TestMapOr_NilMapperOnNilInput(t *testing.T) {
 func TestMapOrElse_Empty(t *testing.T) {
 	opt := MapOrElse(Empty[string](), func(s *string) string { return *s }, func() string { return "default" })
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), "default")
+	require.EqualValues(t, opt.Unwrap(), "default")
 }
 
 func TestMapOrElse_NilMapperOnEmpty(t *testing.T) {
 	opt := MapOrElse(Empty[string](), nil, func() string { return "default" })
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), "default")
+	require.EqualValues(t, opt.Unwrap(), "default")
 }
 
 func TestMapOrElse_NotEmpty(t *testing.T) {
 	opt := MapOrElse(Of(123), func(x *int) string { return fmt.Sprintf("%v", *x) }, func() string { return "default" })
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), "123")
+	require.EqualValues(t, opt.Unwrap(), "123")
 }
 
 func TestMapOrElse_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	MapOrElse(Of(123), nil, func() string { return "default" })
+	require.True(t, MapOrElse(Of(123), nil, func() string { return "default" }).IsEmpty())
 }
 
 func TestMapOrElse_NilInput(t *testing.T) {
@@ -333,10 +310,7 @@ func TestMapOrElse_NilMapperOnNilInput(t *testing.T) {
 }
 
 func TestMapOrElse_NilSupplierOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	MapOrElse(Empty[string](), func(_ *string) int { return 0 }, nil)
+	require.True(t, MapOrElse(Empty[string](), func(_ *string) int { return 0 }, nil).IsEmpty())
 }
 
 func TestFlatMap_Empty(t *testing.T) {
@@ -352,7 +326,7 @@ func TestFlatMap_NilMapperOnEmpty(t *testing.T) {
 func TestFlatMap_MapToNotEmptyOnNotEmpty(t *testing.T) {
 	opt := FlatMap(Of(123), func(x *int) Optional[string] { return Of(fmt.Sprintf("%v", *x)) })
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), "123")
+	require.EqualValues(t, opt.Unwrap(), "123")
 }
 
 func TestFlatMap_MapToEmptyOnNotEmpty(t *testing.T) {
@@ -361,10 +335,7 @@ func TestFlatMap_MapToEmptyOnNotEmpty(t *testing.T) {
 }
 
 func TestFlatMap_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	FlatMap[int, string](Of(123), nil)
+	require.True(t, FlatMap[int, string](Of(123), nil).IsEmpty())
 }
 
 func TestFlatMap_NilInput(t *testing.T) {
@@ -399,35 +370,32 @@ func TestAnd_SuppliedNotEmpty(t *testing.T) {
 	opt := Of(123)
 	opt = opt.And(func() Optional[int] { return Of(321) })
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), 321)
+	require.EqualValues(t, opt.Unwrap(), 321)
 }
 
 func TestAnd_NilSupplierOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Of(123).And(nil)
+	require.True(t, Of(123).And(nil).IsEmpty())
 }
 
 func TestOr_NilSupplierOnNotEmpty(t *testing.T) {
 	opt := Of(123)
 	opt = opt.Or(nil)
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), 123)
+	require.EqualValues(t, opt.Unwrap(), 123)
 }
 
 func TestOr_NotEmpty(t *testing.T) {
 	opt := Of(123)
 	opt = opt.Or(func() Optional[int] { return Of(321) })
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), 123)
+	require.EqualValues(t, opt.Unwrap(), 123)
 }
 
 func TestOr_SuppliedNotEmptyOnEmpty(t *testing.T) {
 	opt := Empty[string]()
 	opt = opt.Or(func() Optional[string] { return Of("123") })
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), "123")
+	require.EqualValues(t, opt.Unwrap(), "123")
 }
 
 func TestOr_SuppliedEmptyOnEmpty(t *testing.T) {
@@ -437,10 +405,7 @@ func TestOr_SuppliedEmptyOnEmpty(t *testing.T) {
 }
 
 func TestOr_NilSupplierOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Empty[string]().Or(nil)
+	require.True(t, Empty[string]().Or(nil).IsEmpty())
 }
 
 func TestOrElse_NotEmpty(t *testing.T) {
@@ -464,21 +429,18 @@ func TestOrElseGet_Empty(t *testing.T) {
 }
 
 func TestOrElseGet_NilSupplierOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Empty[string]().OrElseGet(nil)
+	require.Empty(t, Empty[string]().OrElseGet(nil), "")
 }
 
-func TestOrPanicWith_NotEmpty(t *testing.T) {
-	require.EqualValues(t, Of(123).OrPanicWith(func() error { return errors.New("woops") }), 123)
+func TestUnwrapOr_NotEmpty(t *testing.T) {
+	require.EqualValues(t, Of(123).UnwrapOr(func() error { return errors.New("woops") }), 123)
 }
 
-func TestOrPanicWith_NilSupplierOnNotEmpty(t *testing.T) {
-	require.EqualValues(t, Of(123).OrPanicWith(nil), 123)
+func TestUnwrapOr_NilSupplierOnNotEmpty(t *testing.T) {
+	require.EqualValues(t, Of(123).UnwrapOr(nil), 123)
 }
 
-func TestOrPanicWith_Empty(t *testing.T) {
+func TestUnwrapOr_Empty(t *testing.T) {
 	defer func() {
 		r := recover()
 		require.NotNil(t, r)
@@ -487,10 +449,10 @@ func TestOrPanicWith_Empty(t *testing.T) {
 		require.Error(t, err)
 		require.EqualError(t, err, "woops")
 	}()
-	Empty[string]().OrPanicWith(func() error { return errors.New("woops") })
+	Empty[string]().UnwrapOr(func() error { return errors.New("woops") })
 }
 
-func TestOrPanicWith_SuppliedNilOnEmpty(t *testing.T) {
+func TestUnwrapOr_SuppliedNilOnEmpty(t *testing.T) {
 	defer func() {
 		r := recover()
 		require.NotNil(t, r)
@@ -498,14 +460,14 @@ func TestOrPanicWith_SuppliedNilOnEmpty(t *testing.T) {
 		require.True(t, ok)
 		require.ErrorIs(t, err, ErrNoValue)
 	}()
-	Empty[string]().OrPanicWith(func() error { return nil })
+	Empty[string]().UnwrapOr(func() error { return nil })
 }
 
-func TestOrPanicWith_NilSupplierOnEmpty(t *testing.T) {
+func TestUnwrapOr_NilSupplierOnEmpty(t *testing.T) {
 	defer func() {
 		require.NotNil(t, recover())
 	}()
-	Empty[string]().OrPanicWith(nil)
+	Empty[string]().UnwrapOr(nil)
 }
 
 func TestXor_NilOptOnEmpty(t *testing.T) {
@@ -533,13 +495,13 @@ func TestXor_BothNotEmpty(t *testing.T) {
 func TestXor_FirstEmpty(t *testing.T) {
 	opt := Empty[int]().Xor(Of(321))
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), 321)
+	require.EqualValues(t, opt.Unwrap(), 321)
 }
 
 func TestXor_SecondEmpty(t *testing.T) {
 	opt := Of(123).Xor(Empty[int]())
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), 123)
+	require.EqualValues(t, opt.Unwrap(), 123)
 }
 
 func TestString_Empty(t *testing.T) {
@@ -673,7 +635,7 @@ func TestTake_NotEmpty(t *testing.T) {
 	require.True(t, opt.IsEmpty())
 
 	require.True(t, opt2.IsPresent())
-	require.EqualValues(t, opt2.Get(), 123)
+	require.EqualValues(t, opt2.Unwrap(), 123)
 }
 
 func TestTake_Ptr(t *testing.T) {
@@ -685,14 +647,14 @@ func TestTake_Ptr(t *testing.T) {
 	require.True(t, opt.IsEmpty())
 
 	require.True(t, opt2.IsPresent())
-	require.EqualValues(t, opt2.Get(), &v)
+	require.EqualValues(t, opt2.Unwrap(), &v)
 }
 
 func TestReplace_Empty(t *testing.T) {
 	opt := Empty[int]()
 	opt2 := opt.Replace(321)
 
-	require.EqualValues(t, opt.Get(), 321)
+	require.EqualValues(t, opt.Unwrap(), 321)
 	require.True(t, opt2.IsEmpty())
 }
 
@@ -704,10 +666,10 @@ func TestReplace_NotEmpty(t *testing.T) {
 	opt2 := opt.Replace(lfg)
 
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), lfg)
+	require.EqualValues(t, opt.Unwrap(), lfg)
 
 	require.True(t, opt2.IsPresent())
-	require.EqualValues(t, opt2.Get(), meh)
+	require.EqualValues(t, opt2.Unwrap(), meh)
 }
 
 type sampleStruct struct {
@@ -784,7 +746,7 @@ func TestUnmarshalJSON_ValidDataOnEmpty(t *testing.T) {
 	err := opt.UnmarshalJSON([]byte(sampleJSON))
 	require.NoError(t, err)
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), sampleStructInst)
+	require.EqualValues(t, opt.Unwrap(), sampleStructInst)
 }
 
 func TestUnmarshalJSON_ValidDataOnNotEmpty(t *testing.T) {
@@ -796,7 +758,7 @@ func TestUnmarshalJSON_ValidDataOnNotEmpty(t *testing.T) {
 	err := opt.UnmarshalJSON([]byte(sampleJSON))
 	require.NoError(t, err)
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), *sampleStructInst)
+	require.EqualValues(t, opt.Unwrap(), *sampleStructInst)
 }
 
 func TestFlatten_Empty(t *testing.T) {
@@ -806,7 +768,7 @@ func TestFlatten_Empty(t *testing.T) {
 func TestFlatten_NotEmpty(t *testing.T) {
 	opt := Flatten(Of(Of(123)))
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), 123)
+	require.EqualValues(t, opt.Unwrap(), 123)
 }
 
 func TestZip_SomeEmpty(t *testing.T) {
@@ -819,7 +781,7 @@ func TestZip_BothNotEmpty(t *testing.T) {
 	opt := Zip(Of(123), Of("gm"))
 	require.True(t, opt.IsPresent())
 
-	v := opt.Get()
+	v := opt.Unwrap()
 	require.EqualValues(t, v.First, 123)
 	require.EqualValues(t, v.Second, "gm")
 }
@@ -882,10 +844,7 @@ func TestZipWith_SomeEmpty(t *testing.T) {
 }
 
 func TestZipWith_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	ZipWith[string, int, interface{}](Of("gm"), Of(123), nil)
+	require.True(t, ZipWith[string, int, interface{}](Of("gm"), Of(123), nil).IsEmpty())
 }
 
 func TestZipWith_BothNotEmpty(t *testing.T) {
@@ -893,7 +852,7 @@ func TestZipWith_BothNotEmpty(t *testing.T) {
 		return []interface{}{*x, *y}
 	})
 	require.True(t, opt.IsPresent())
-	require.EqualValues(t, opt.Get(), []interface{}{"gm", []int{1, 2, 3, 4}})
+	require.EqualValues(t, opt.Unwrap(), []interface{}{"gm", []int{1, 2, 3, 4}})
 }
 
 func TestZipWith_BothNotEmptyWithNilReturn(t *testing.T) {
@@ -909,10 +868,7 @@ func TestIs_Empty(t *testing.T) {
 }
 
 func TestIs_NilPredicateOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Of(123).Is(nil)
+	require.False(t, Of(123).Is(nil))
 }
 
 func TestIs_NotEmpty(t *testing.T) {
@@ -951,10 +907,8 @@ func TestValOr_Empty(t *testing.T) {
 }
 
 func TestValOr_NilErrOnEmpty(t *testing.T) {
-	defer func() {
-		require.EqualValues(t, recover(), "provided err is nil")
-	}()
-	_, _ = Empty[string]().ValOr(nil)
+	_, err := Empty[string]().ValOr(nil)
+	require.ErrorIs(t, err, ErrNoValue)
 }
 
 func TestValOrElse_NotEmpty(t *testing.T) {
@@ -975,15 +929,13 @@ func TestValOrElse_Empty(t *testing.T) {
 }
 
 func TestValOrElse_NilSupplierOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	_, _ = Empty[string]().ValOrElse(nil)
+	v, err := Empty[string]().ValOrElse(nil)
+	require.EqualValues(t, v, "")
+	require.ErrorIs(t, err, ErrNoValue)
 }
 
 func TestValOrElse_SuppliedNilOnEmpty(t *testing.T) {
-	defer func() {
-		require.EqualValues(t, recover(), "supplied err is nil")
-	}()
-	_, _ = Empty[string]().ValOrElse(func() error { return nil })
+	v, err := Empty[string]().ValOrElse(func() error { return nil })
+	require.EqualValues(t, v, "")
+	require.ErrorIs(t, err, ErrNoValue)
 }

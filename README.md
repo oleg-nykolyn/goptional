@@ -57,7 +57,7 @@ fmt.Println(opt == nil) // true
 fmt.Println(opt.IsPresent()) // false
 ```
 
-### Presence Checks
+### Presence
 
 ```go
 opt := goptional.Of(123)
@@ -142,26 +142,13 @@ fmt.Println(v)   // 0
 fmt.Println(err) // ouch
 ```
 
-`Get`
-
-```go
-opt := goptional.Of(123)
-
-// Retrieve the value held by opt, if any, or panic otherwise.
-fmt.Println((opt.Get())) // 123
-
-opt2 := goptional.Empty[int]()
-
-fmt.Println(opt2.Get()) // panics
-```
-
 `OrDefault`
 
 ```go
 opt := goptional.Empty[string]()
 
-// Retrieve the value held by opt, if any, or 
-// the zero value of the string type.
+// Return the value held by opt, if any, or 
+// the zero value associated with the Optional type (string -> "", int -> 0, bool -> false, ptr -> nil ...)
 fmt.Println(opt.OrDefault()) // ""
 ```
 
@@ -187,13 +174,26 @@ v := opt.OrElseGet(func() string {
 fmt.Println(v) // gm
 ```
 
-`OrPanicWith`
+`Unwrap`
+
+```go
+opt := goptional.Of(123)
+
+// Retrieve the value held by opt, if any, or panic otherwise.
+fmt.Println((opt.Unwrap())) // 123
+
+opt2 := goptional.Empty[int]()
+
+fmt.Println(opt2.Unwrap()) // panics
+```
+
+`UnwrapOr`
 
 ```go
 opt := goptional.Empty[string]()
 
 // Panic with an error provided by the given supplier if opt is empty.
-_ = opt.OrPanicWith(func() error {
+_ = opt.UnwrapOr(func() error {
     return errors.New("woops")
 }) // panics
 ```
@@ -209,7 +209,7 @@ opt = opt.Filter(func(v *int) bool { return *v > 100 })
 opt = opt.Filter(func(v *int) bool { return *v%2 == 0 })
 
 fmt.Println(opt.IsPresent()) // false
-fmt.Println(opt.Get())       // panics
+fmt.Println(opt.Unwrap())    // panics
 ```
 
 ```go
@@ -302,7 +302,7 @@ opt := goptional.Of(goptional.Of(123))
 // Transform Optional[Optional[T]] into Optional[T].
 fOpt := goptional.Flatten(opt)
 
-fmt.Println(fOpt.Get()) // 123
+fmt.Println(fOpt.Unwrap()) // 123
 ```
 
 ### Peeking
@@ -400,7 +400,7 @@ opt1 := goptional.Of(123)
 opt2 := opt1.Take()
 
 fmt.Println(opt1.IsEmpty()) // true
-fmt.Println(opt2.Get())     // 123
+fmt.Println(opt2.Unwrap())  // 123
 ```
 
 `Replace`
@@ -411,15 +411,15 @@ opt1 := goptional.Of(123)
 // Transfer the value of opt1, if any, to opt2 and replace it with 789.
 opt2 := opt1.Replace(789)
 
-fmt.Println(opt1.Get()) // 789
-fmt.Println(opt2.Get()) // 123
+fmt.Println(opt1.Unwrap()) // 789
+fmt.Println(opt2.Unwrap()) // 123
 ```
 
 ```go
 opt1 := goptional.Empty[int]()
 opt2 := opt1.Replace(789)
 
-fmt.Println(opt1.Get()) // 789
+fmt.Println(opt1.Unwrap())  // 789
 fmt.Println(opt2.IsEmpty()) // true
 ```
 
@@ -454,8 +454,8 @@ numAsJSON := "123"
 // Populate opt with the given JSON.
 err := opt.UnmarshalJSON([]byte(numAsJSON))
 
-fmt.Println(err == nil) // true
-fmt.Println(opt.Get())  // 123
+fmt.Println(err == nil)   // true
+fmt.Println(opt.Unwrap()) // 123
 ```
 
 ### Zipping
@@ -471,7 +471,7 @@ optPair := goptional.Zip(opt1, opt2)
 
 fmt.Println(optPair.IsPresent()) // true
 
-pair := optPair.Get()
+pair := optPair.Unwrap()
 fmt.Println(pair.First)  // 123
 fmt.Println(pair.Second) // gm
 
@@ -493,7 +493,7 @@ mapper := func(x *int, y *string) string {
 opt3 := goptional.ZipWith(opt1, opt2, mapper)
 
 fmt.Println(opt3.IsPresent()) // true
-fmt.Println(opt3.Get())       // 123_gm
+fmt.Println(opt3.Unwrap())    // 123_gm
 
 // Return an empty Optional as one of the arguments to ZipWith is an empty Optional.
 opt3 = goptional.ZipWith(opt1, goptional.Empty[string](), mapper)
@@ -513,8 +513,8 @@ pair := goptional.Pair[goptional.Optional[int], goptional.Optional[string]]{
 // Unwrap the given Optional Pair.
 opt1, opt2 := goptional.Unzip(goptional.Of(&pair))
 
-fmt.Println(opt1.Get()) // 123
-fmt.Println(opt2.Get()) // gm
+fmt.Println(opt1.Unwrap()) // 123
+fmt.Println(opt2.Unwrap()) // gm
 
 // Create an empty Optional Pair.
 emptyPair := goptional.Empty[*goptional.Pair[goptional.Optional[int], goptional.Optional[string]]]()

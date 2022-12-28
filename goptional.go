@@ -49,10 +49,10 @@ func (o Optional[T]) IsEmpty() bool {
 	return o == nil
 }
 
-// Get returns the value held by this instance.
+// Unwrap returns the value held by this instance, if any, or _panics_ otherwise.
 //
-// It panics if this instance is empty.
-func (o Optional[T]) Get() T {
+// Use it only if you know what you are doing. Usage of OrDefault / OrElse is preferred.
+func (o Optional[T]) Unwrap() T {
 	if o.IsEmpty() {
 		panic(ErrNoValue)
 	}
@@ -60,40 +60,42 @@ func (o Optional[T]) Get() T {
 }
 
 // IfPresent applies the action to the value held by this instance.
-// Does nothing if this instance is empty.
-//
-// It panics if action is nil and this instance is not empty.
+// Does nothing if this instance is empty. If action is nil, nothing is done.
 func (o Optional[T]) IfPresent(action func(*T)) {
-	if o.IsPresent() {
-		v := o.Get()
+	if o.IsPresent() && action != nil {
+		v := o.Unwrap()
 		action(&v)
 	}
 }
 
 // IfPresentOrElse applies the action to the value held by this instance or calls emptyAction if this instance is empty.
-//
-// It panics if one of these is true:
-//   - action is nil and this instance is not empty
-//   - emptyAction is nil and this instance is empty
+// If action or emptyAction are nil, nothing is done.
 func (o Optional[T]) IfPresentOrElse(action func(*T), emptyAction func()) {
 	if o.IsPresent() {
-		v := o.Get()
-		action(&v)
+		if action != nil {
+			v := o.Unwrap()
+			action(&v)
+		}
 	} else {
-		emptyAction()
+		if emptyAction != nil {
+			emptyAction()
+		}
 	}
 }
 
 // Filter returns self if self is empty or
 // if the predicate applied to its value returns false.
-//
-// It panics if predicate is nil and this instance is not empty.
+// If this instance is not empty and predicate is nil, it returns an empty Optional.
 func (o Optional[T]) Filter(predicate func(*T) bool) Optional[T] {
 	if o.IsEmpty() {
 		return o
 	}
 
-	v := o.Get()
+	if predicate == nil {
+		return Empty[T]()
+	}
+
+	v := o.Unwrap()
 	if predicate(&v) {
 		return o
 	}
@@ -105,36 +107,50 @@ func (o Optional[T]) Filter(predicate func(*T) bool) Optional[T] {
 //   - an empty Optional if input is empty
 //   - a new Optional holding a value that results from the application of the given mapper to the value of input
 //
-// It panics if mapper is nil and input is not empty.
+// If this instance is not empty and mapper is nil, it returns an empty Optional of the target type.
 func Map[X, Y any](input Optional[X], mapper func(*X) Y) Optional[Y] {
-	if input.IsEmpty() {
+	if input.IsEmpty() || mapper == nil {
 		return Empty[Y]()
 	}
-	v := input.Get()
+	v := input.Unwrap()
 	return Of(mapper(&v))
 }
 
 // MapOr is similar to Map, but if input is empty, it returns a new Optional holding a default value instead.
-//
-// It panics if mapper is nil and input is not empty.
+// If this instance is not empty and mapper is nil, it returns an empty Optional of the target type.
 func MapOr[X, Y any](input Optional[X], mapper func(*X) Y, other Y) Optional[Y] {
 	if input.IsEmpty() {
 		return Of(other)
 	}
-	v := input.Get()
+
+	if mapper == nil {
+		return Empty[Y]()
+	}
+
+	v := input.Unwrap()
 	return Of(mapper(&v))
 }
 
 // MapOrElse is similar to MapOr, but if input is empty, it returns a new Optional holding the value provided by the given supplier.
 //
-// It panics if one of these is true:
-//   - supplier is nil and input is empty
-//   - mapper is nil and input is not empty
+// If one of these is true:
+//   - this instance is empty and supplier is nil
+//   - this instance holds a value and mapper is nil
+//
+// then it returns an empty Optional of the target type.
 func MapOrElse[X, Y any](input Optional[X], mapper func(*X) Y, supplier func() Y) Optional[Y] {
 	if input.IsEmpty() {
-		return Of(supplier())
+		if supplier != nil {
+			return Of(supplier())
+		}
+		return Empty[Y]()
 	}
-	v := input.Get()
+
+	if mapper == nil {
+		return Empty[Y]()
+	}
+
+	v := input.Unwrap()
 	return Of(mapper(&v))
 }
 
@@ -142,12 +158,13 @@ func MapOrElse[X, Y any](input Optional[X], mapper func(*X) Y, supplier func() Y
 //   - an empty Optional if input is empty
 //   - a new Optional that results from the application of the given mapper to the value of input
 //
-// It panics if mapper is nil and input is not empty.
+// If this instance is not empty and mapper is nil, it returns an empty Optional of the target type.
 func FlatMap[X, Y any](input Optional[X], mapper func(*X) Optional[Y]) Optional[Y] {
-	if input.IsEmpty() {
+	if input.IsEmpty() || mapper == nil {
 		return Empty[Y]()
 	}
-	v := input.Get()
+
+	v := input.Unwrap()
 	return mapper(&v)
 }
 
@@ -155,11 +172,16 @@ func FlatMap[X, Y any](input Optional[X], mapper func(*X) Optional[Y]) Optional[
 //   - self if self is empty
 //   - a new Optional provided by the given supplier
 //
-// It panics if this instance is not empty and supplier is nil.
+// If this instance is not empty and supplier is nil, it returns an empty Optional.
 func (o Optional[T]) And(supplier func() Optional[T]) Optional[T] {
 	if o.IsEmpty() {
 		return o
 	}
+
+	if supplier == nil {
+		return Empty[T]()
+	}
+
 	return supplier()
 }
 
@@ -167,9 +189,9 @@ func (o Optional[T]) And(supplier func() Optional[T]) Optional[T] {
 //   - self if self is not empty
 //   - a new Optional provided by the given supplier
 //
-// It panics if this instance is empty and supplier is nil.
+// If this instance is empty and supplier is nil, it returns self.
 func (o Optional[T]) Or(supplier func() Optional[T]) Optional[T] {
-	if o.IsPresent() {
+	if o.IsPresent() || supplier == nil {
 		return o
 	}
 	return supplier()
@@ -194,40 +216,50 @@ func (o Optional[T]) OrDefault() T {
 		var zero T
 		return zero
 	}
-	return o.Get()
+	return o.Unwrap()
 }
 
 // OrElse returns the value held by this instance, if any, or the given value otherwise.
 func (o Optional[T]) OrElse(fallback T) T {
 	if o.IsPresent() {
-		return o.Get()
+		return o.Unwrap()
 	}
 	return fallback
 }
 
 // OrElseGet returns the value held by this instance, if any, or a value provided by the given supplier otherwise.
 //
-// It panics if this instance is empty and supplier is nil.
+// If this instance is empty and supplier is nil, it returns the zero value of T.
 func (o Optional[T]) OrElseGet(supplier func() T) T {
 	if o.IsPresent() {
-		return o.Get()
+		return o.Unwrap()
 	}
+
+	if supplier == nil {
+		var zero T
+		return zero
+	}
+
 	return supplier()
 }
 
-// OrPanicWith returns the value held by this instance, if any, or panics with an error provided by the given supplier otherwise.
+// UnwrapOr returns the value held by this instance, if any, or panics with an error provided by the given supplier otherwise.
 //
-// It panics if this instance is empty and supplier is nil.
-func (o Optional[T]) OrPanicWith(supplier func() error) T {
+// If this instance is empty and supplier is nil or returns a nil error, it panics with ErrNoValue instead.
+func (o Optional[T]) UnwrapOr(supplier func() error) T {
 	if o.IsEmpty() {
-		err := supplier()
-		if err == nil {
+		if supplier == nil {
 			panic(ErrNoValue)
-		} else {
+		}
+
+		if err := supplier(); err != nil {
 			panic(err)
+		} else {
+			panic(ErrNoValue)
 		}
 	}
-	return o.Get()
+
+	return o.Unwrap()
 }
 
 // Equals compares two Optionals for equality.
@@ -238,7 +270,7 @@ func (o Optional[T]) Equals(o2 Optional[T]) bool {
 		return true
 	}
 	if o.IsPresent() && o2.IsPresent() {
-		return reflect.DeepEqual(o.Get(), o2.Get())
+		return reflect.DeepEqual(o.Unwrap(), o2.Unwrap())
 	}
 	return false
 }
@@ -250,7 +282,7 @@ func (o Optional[T]) MarshalJSON() ([]byte, error) {
 	if o.IsEmpty() {
 		return nilAsJSON, nil
 	}
-	return json.Marshal(o.Get())
+	return json.Marshal(o.Unwrap())
 }
 
 // UnmarshalJSON attempts to populate this instance with the given JSON data.
@@ -275,7 +307,7 @@ func (o Optional[T]) String() string {
 	if o.IsEmpty() {
 		return "Optional.empty"
 	}
-	return spew.Sprintf("Optional[%#+v]", o.Get())
+	return spew.Sprintf("Optional[%#+v]", o.Unwrap())
 }
 
 // Take takes the value out of this instance, if any, leaving an empty Optional in its place.
@@ -283,7 +315,7 @@ func (o *Optional[T]) Take() Optional[T] {
 	if o.IsEmpty() {
 		return *o
 	}
-	v := o.Get()
+	v := o.Unwrap()
 	*o = nil
 	return Of(v)
 }
@@ -297,7 +329,7 @@ func (o *Optional[T]) Replace(value T) Optional[T] {
 		*o = inOpt
 		return Empty[T]()
 	}
-	v := o.Get()
+	v := o.Unwrap()
 	*o = inOpt
 	return Of(v)
 }
@@ -316,7 +348,7 @@ type Pair[X, Y any] struct {
 // Otherwise, an empty Optional is returned.
 func Zip[X, Y any](o1 Optional[X], o2 Optional[Y]) Optional[*Pair[X, Y]] {
 	if o1.IsPresent() && o2.IsPresent() {
-		return Of(&Pair[X, Y]{First: o1.Get(), Second: o2.Get()})
+		return Of(&Pair[X, Y]{First: o1.Unwrap(), Second: o2.Unwrap()})
 	}
 	return Empty[*Pair[X, Y]]()
 }
@@ -325,7 +357,7 @@ func Zip[X, Y any](o1 Optional[X], o2 Optional[Y]) Optional[*Pair[X, Y]] {
 // If o is not empty, it returns the unwrapped pair. Otherwise, two empty Optionals are returned.
 func Unzip[X, Y any](o Optional[*Pair[Optional[X], Optional[Y]]]) (Optional[X], Optional[Y]) {
 	if o.IsPresent() {
-		pair := o.Get()
+		pair := o.Unwrap()
 		return pair.First, pair.Second
 	}
 	return Empty[X](), Empty[Y]()
@@ -336,11 +368,15 @@ func Unzip[X, Y any](o Optional[*Pair[Optional[X], Optional[Y]]]) (Optional[X], 
 // that results from the application of the given mapper to the values of o1 & o2.
 // Otherwise, an empty Optional is returned.
 //
-// It panics if o1 & o2 are both non-empty and mapper is nil.
+// It o1 & o2 are both non-empty and mapper is nil, it returns an empty Optional of the target type.
 func ZipWith[X, Y, Z any](o1 Optional[X], o2 Optional[Y], mapper func(*X, *Y) Z) Optional[Z] {
 	if o1.IsPresent() && o2.IsPresent() {
-		v1 := o1.Get()
-		v2 := o2.Get()
+		if mapper == nil {
+			return Empty[Z]()
+		}
+
+		v1 := o1.Unwrap()
+		v2 := o2.Unwrap()
 		return Of(mapper(&v1, &v2))
 	}
 	return Empty[Z]()
@@ -349,7 +385,7 @@ func ZipWith[X, Y, Z any](o1 Optional[X], o2 Optional[Y], mapper func(*X, *Y) Z)
 // Flatten flattens the given Optional.
 func Flatten[T any](o Optional[Optional[T]]) Optional[T] {
 	if o.IsPresent() {
-		return o.Get()
+		return o.Unwrap()
 	}
 	return Empty[T]()
 }
@@ -357,19 +393,19 @@ func Flatten[T any](o Optional[Optional[T]]) Optional[T] {
 // Is checks if the value of this instance satisfies the given predicate.
 // If this instance is empty, it returns false.
 //
-// It panics if this instance is not empty and predicate is nil.
+// If this instance is not empty and predicate is nil, it returns false.
 func (o Optional[T]) Is(predicate func(*T) bool) bool {
-	if o.IsEmpty() {
+	if o.IsEmpty() || predicate == nil {
 		return false
 	}
-	v := o.Get()
+	v := o.Unwrap()
 	return predicate(&v)
 }
 
 // Val returns the value held by this instance, if any. It returns ErrNoValue otherwise.
 func (o Optional[T]) Val() (T, error) {
 	if o.IsPresent() {
-		return o.Get(), nil
+		return o.Unwrap(), nil
 	}
 
 	var zero T
@@ -377,16 +413,15 @@ func (o Optional[T]) Val() (T, error) {
 }
 
 // ValOr returns the value held by this instance, if any. It returns the given error otherwise.
-//
-// It panics if this instance is empty and err is nil.
+// On the other hand, if this instance is empty and err is nil, it returns ErrNoValue.
 func (o Optional[T]) ValOr(err error) (T, error) {
 	if o.IsPresent() {
-		return o.Get(), nil
+		return o.Unwrap(), nil
 	}
 
 	var zero T
 	if err == nil {
-		panic("provided err is nil")
+		return zero, ErrNoValue
 	}
 	return zero, err
 }
@@ -394,16 +429,21 @@ func (o Optional[T]) ValOr(err error) (T, error) {
 // ValOrElse returns the value held by this instance, if any.
 // It returns the error provided by the given supplier otherwise.
 //
-// It panics if this instance is empty and supplier is nil.
+// If this instance is empty and supplier is either nil or returns a nil err, it returns ErrNoValue.
 func (o Optional[T]) ValOrElse(supplier func() error) (T, error) {
 	if o.IsPresent() {
-		return o.Get(), nil
+		return o.Unwrap(), nil
 	}
 
 	var zero T
+	if supplier == nil {
+		return zero, ErrNoValue
+	}
+
 	err := supplier()
 	if err == nil {
-		panic("supplied err is nil")
+		return zero, ErrNoValue
 	}
+
 	return zero, err
 }
