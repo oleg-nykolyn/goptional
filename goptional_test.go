@@ -3,6 +3,7 @@ package goptional
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -632,7 +633,7 @@ func TestEquals_NotEqualValuesComposite(t *testing.T) {
 	require.False(t, opt1.Equals(opt2))
 }
 
-func TestOrZero_Empty(t *testing.T) {
+func TestOrDefault_Empty(t *testing.T) {
 	assert.EqualValues(t, Empty[string]().OrDefault(), "")
 	assert.False(t, Empty[bool]().OrDefault())
 	assert.Nil(t, Empty[*string]().OrDefault())
@@ -640,7 +641,7 @@ func TestOrZero_Empty(t *testing.T) {
 	assert.Nil(t, Empty[[]string]().OrDefault())
 }
 
-func TestOrZero_NotEmpty(t *testing.T) {
+func TestOrDefault_NotEmpty(t *testing.T) {
 	assert.EqualValues(t, Of("abc").OrDefault(), "abc")
 	assert.True(t, Of(true).OrDefault())
 	s := "abc"
@@ -900,4 +901,22 @@ func TestZipWith_BothNotEmptyWithNilReturn(t *testing.T) {
 		return nil
 	})
 	require.True(t, opt.IsEmpty())
+}
+
+func TestSatisfies_Empty(t *testing.T) {
+	require.False(t, Empty[int]().Satisfies(nil))
+	require.False(t, Empty[int]().Satisfies(func(_ *int) bool { return true }))
+}
+
+func TestSatisfies_NilPredicateOnNotEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	Of(123).Satisfies(nil)
+}
+
+func TestSatisfies_NotEmpty(t *testing.T) {
+	require.True(t, Of(123).Satisfies(func(x *int) bool { return *x%2 != 0 }))
+	require.True(t, Of(1234).Satisfies(func(x *int) bool { return *x > 100 }))
+	require.True(t, Of([]string{"gm", "Gn"}).Satisfies(func(x *[]string) bool { return strings.ToLower((*x)[1]) == "gn" }))
 }
