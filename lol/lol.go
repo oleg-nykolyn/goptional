@@ -7,12 +7,23 @@ import (
 )
 
 func main() {
-	opt := goptional.Empty[int]()
-	numAsJSON := "123"
+	// Create a pair of Optionals.
+	pair := goptional.Pair[goptional.Optional[int], goptional.Optional[string]]{
+		First:  goptional.Of(123),
+		Second: goptional.Of("gm"),
+	}
 
-	// Populate opt with the given JSON.
-	err := opt.UnmarshalJSON([]byte(numAsJSON))
+	// Unwrap the given optional pair.
+	// Return two empty optionals if the given optional is empty.
+	opt1, opt2 := goptional.Unzip(goptional.Of(&pair))
 
-	fmt.Println(err == nil) // true
-	fmt.Println(opt.Get())  // 123
+	fmt.Println(opt1.Get()) // 123
+	fmt.Println(opt2.Get()) // gm
+
+	// Create empty pair.
+	emptyPair := goptional.Empty[*goptional.Pair[goptional.Optional[int], goptional.Optional[string]]]()
+	opt1, opt2 = goptional.Unzip(emptyPair)
+
+	fmt.Println(opt1.IsEmpty()) // true
+	fmt.Println(opt2.IsEmpty()) // true
 }

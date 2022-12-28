@@ -402,7 +402,26 @@ fmt.Println(opt.Get())  // 123
 `Unzip`
 
 ```go
-// TODO
+// Create a Pair of Optionals.
+pair := goptional.Pair[goptional.Optional[int], goptional.Optional[string]]{
+    First:  goptional.Of(123),
+    Second: goptional.Of("gm"),
+}
+
+// Unwrap the given Optional Pair.
+opt1, opt2 := goptional.Unzip(goptional.Of(&pair))
+
+fmt.Println(opt1.Get()) // 123
+fmt.Println(opt2.Get()) // gm
+
+// Create an empty Optional Pair.
+emptyPair := goptional.Empty[*goptional.Pair[goptional.Optional[int], goptional.Optional[string]]]()
+
+// Return two empty Optionals if the given Optional is empty.
+opt1, opt2 = goptional.Unzip(emptyPair)
+
+fmt.Println(opt1.IsEmpty()) // true
+fmt.Println(opt2.IsEmpty()) // true
 ```
 
 ### String Representation
