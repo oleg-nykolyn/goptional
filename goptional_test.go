@@ -920,3 +920,70 @@ func TestSatisfies_NotEmpty(t *testing.T) {
 	require.True(t, Of(1234).Satisfies(func(x *int) bool { return *x > 100 }))
 	require.True(t, Of([]string{"gm", "Gn"}).Satisfies(func(x *[]string) bool { return strings.ToLower((*x)[1]) == "gn" }))
 }
+
+func TestVal_NotEmpty(t *testing.T) {
+	v, err := Of(123).Val()
+	require.EqualValues(t, v, 123)
+	require.NoError(t, err)
+}
+
+func TestVal_Empty(t *testing.T) {
+	v, err := Empty[string]().Val()
+	require.EqualValues(t, v, "")
+	require.ErrorIs(t, err, ErrNoValue)
+}
+
+func TestValOr_NotEmpty(t *testing.T) {
+	v, err := Of(123).ValOr(nil)
+	require.EqualValues(t, v, 123)
+	require.NoError(t, err)
+
+	v2, err := Of(321).ValOr(errors.New("woops"))
+	require.EqualValues(t, v2, 321)
+	require.NoError(t, err)
+}
+
+func TestValOr_Empty(t *testing.T) {
+	inErr := errors.New("woops")
+	v, err := Empty[string]().ValOr(inErr)
+	require.EqualValues(t, v, "")
+	require.ErrorIs(t, err, inErr)
+}
+
+func TestValOr_NilErrOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	_, _ = Empty[string]().ValOr(nil)
+}
+
+func TestValOrElse_NotEmpty(t *testing.T) {
+	v, err := Of(123).ValOrElse(nil)
+	require.EqualValues(t, v, 123)
+	require.NoError(t, err)
+
+	v2, err := Of(321).ValOrElse(func() error { return errors.New("woops") })
+	require.EqualValues(t, v2, 321)
+	require.NoError(t, err)
+}
+
+func TestValOrElse_Empty(t *testing.T) {
+	inErr := errors.New("woops")
+	v, err := Empty[string]().ValOrElse(func() error { return inErr })
+	require.EqualValues(t, v, "")
+	require.ErrorIs(t, err, inErr)
+}
+
+func TestValOrElse_NilSupplierOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	_, _ = Empty[string]().ValOrElse(nil)
+}
+
+func TestValOrElse_SuppliedNilOnEmpty(t *testing.T) {
+	defer func() {
+		require.NotNil(t, recover())
+	}()
+	_, _ = Empty[string]().ValOrElse(func() error { return nil })
+}
