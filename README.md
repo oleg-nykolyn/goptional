@@ -57,7 +57,7 @@ fmt.Println(opt == nil) // true
 fmt.Println(opt.IsPresent()) // false
 ```
 
-### Presence Checks
+### Presence
 
 ```go
 opt := goptional.Of(123)
