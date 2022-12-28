@@ -952,7 +952,7 @@ func TestValOr_Empty(t *testing.T) {
 
 func TestValOr_NilErrOnEmpty(t *testing.T) {
 	defer func() {
-		require.NotNil(t, recover())
+		require.EqualValues(t, recover(), "provided err is nil")
 	}()
 	_, _ = Empty[string]().ValOr(nil)
 }
@@ -983,7 +983,7 @@ func TestValOrElse_NilSupplierOnEmpty(t *testing.T) {
 
 func TestValOrElse_SuppliedNilOnEmpty(t *testing.T) {
 	defer func() {
-		require.NotNil(t, recover())
+		require.EqualValues(t, recover(), "supplied err is nil")
 	}()
 	_, _ = Empty[string]().ValOrElse(func() error { return nil })
 }

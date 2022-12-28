@@ -400,7 +400,7 @@ func (o Optional[T]) ValOrElse(supplier func() error) (T, error) {
 	var zero T
 	err := supplier()
 	if err == nil {
-		panic("provided err is nil")
+		panic("supplied err is nil")
 	}
 	return zero, err
 }
