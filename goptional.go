@@ -192,7 +192,7 @@ func (o Optional[T]) Xor(o2 Optional[T]) Optional[T] {
 	return o2
 }
 
-// OrZero returns the value held by this instance, if there is any, or the zero value of T otherwise.
+// OrZero returns the value held by this instance, if any, or the zero value of T otherwise.
 func (o Optional[T]) OrZero() T {
 	if o.IsEmpty() {
 		var zero T
@@ -201,7 +201,7 @@ func (o Optional[T]) OrZero() T {
 	return o.Get()
 }
 
-// OrElse returns the value held by this instance, if there is any, or the given value otherwise.
+// OrElse returns the value held by this instance, if any, or the given value otherwise.
 func (o Optional[T]) OrElse(fallback T) T {
 	if o.IsPresent() {
 		return o.Get()
@@ -209,7 +209,7 @@ func (o Optional[T]) OrElse(fallback T) T {
 	return fallback
 }
 
-// OrElseGet returns the value held by this instance, if there is any, or a value provided by the given supplier otherwise.
+// OrElseGet returns the value held by this instance, if any, or a value provided by the given supplier otherwise.
 //
 // It panics if this instance is empty and supplier is nil.
 func (o Optional[T]) OrElseGet(supplier func() T) T {
@@ -219,7 +219,7 @@ func (o Optional[T]) OrElseGet(supplier func() T) T {
 	return supplier()
 }
 
-// OrElsePanicWithErr returns the value held by this instance, if there is any, or panics with an error provided by the given supplier otherwise.
+// OrElsePanicWithErr returns the value held by this instance, if any, or panics with an error provided by the given supplier otherwise.
 //
 // It panics if this instance is empty and supplier is nil.
 func (o Optional[T]) OrElsePanicWithErr(supplier func() error) T {
@@ -282,7 +282,7 @@ func (o Optional[T]) String() string {
 	return spew.Sprintf("Optional[%#+v]", o.Get())
 }
 
-// Take takes the value out of this instance, if there is any, leaving an empty Optional in its place.
+// Take takes the value out of this instance, if any, leaving an empty Optional in its place.
 func (o *Optional[T]) Take() Optional[T] {
 	if o.IsEmpty() {
 		return *o

@@ -37,13 +37,8 @@ import "github.com/nykolynoleg/goptional"
 // Create an Optional of type int that holds 123.
 opt := goptional.Of(123)
 
-// If the argument to Of is either nil or invalid, an empty Optional is returned instead.
+// 💡 If the argument to Of is either nil or invalid, return an empty Optional instead.
 opt2 := goptional.Of[[]string](nil)
-
-// Is true.
-if opt2.IsEmpty() {
-    // ...
-}
 ```
 
 `Empty`
@@ -54,32 +49,23 @@ if opt2.IsEmpty() {
 // Create an empty Optional of type string.
 opt := goptional.Empty[string]()
 
-// Is true.
-if opt == nil {
+fmt.Println(opt)        // Optional.empty
+fmt.Println(opt == nil) // true
 
-}
-
-// Will not panic.
-if opt.IsPresent() {
-    // ...
-}
+// This does not panic.
+fmt.Println(opt.IsPresent()) // false
 ```
 
-### Presence
+### Presence Checks
 
 ```go
 opt := goptional.Of(123)
 
 // Check if opt holds a value.
-// In this specific instance, it returns true.
-if opt.IsPresent() {
-    // ...
-}
+fmt.Println(opt.IsPresent()) // true
 
-// Check if opt has no value.
-if opt.IsEmpty() {
-    // ...
-}
+// Check if opt is empty.
+fmt.Println(opt.IsEmpty()) // false
 ```
 
 ### Equality
@@ -89,11 +75,9 @@ opt := goptional.Of(123)
 opt2 := goptional.Of(321)
 
 // Compare opt & opt2 for equality.
-// It returns true if both contain the same value, or if both are empty.
-// Otherwise, it returns false.
-if opt.Equals(opt2) {
-    // ...
-}
+// Return true if both contain the same value, or if both are empty.
+// Otherwise, return false.
+fmt.Println(opt.Equals(opt2)) // false
 ```
 
 ### Value Retrieval
@@ -103,9 +87,12 @@ if opt.Equals(opt2) {
 ```go
 opt := goptional.Of(123)
 
-// Retrieve the value held by opt.
-// Panic otherwise.
-v := opt.Get()
+// Retrieve the value held by opt, if any, or panic otherwise.
+fmt.Println((opt.Get())) // 123
+
+opt2 := goptional.Empty[int]()
+
+fmt.Println(opt2.Get()) // panics
 ```
 
 `OrElse`
@@ -114,7 +101,7 @@ v := opt.Get()
 opt := goptional.Empty[string]()
 
 // Provide a default value if opt is empty.
-v := opt.OrElse("default")
+fmt.Println(opt.OrElse("lfg")) // lfg
 ```
 
 `OrElseGet`
@@ -124,8 +111,10 @@ opt := goptional.Empty[string]()
 
 // Provide a default through a supplier if opt is empty.
 v := opt.OrElseGet(func() string {
-    return "default"
+    return "gm"
 })
+
+fmt.Println(v) // gm
 ```
 
 `OrZero`
@@ -133,14 +122,9 @@ v := opt.OrElseGet(func() string {
 ```go
 opt := goptional.Empty[string]()
 
-// Retrieve the value held by opt or 
+// Retrieve the value held by opt, if any, or 
 // the zero value of its type otherwise.
-v := opt.OrZero()
-
-// Is true.
-if v == "" {
-    // ...
-}
+fmt.Println(opt.OrZero()) // ""
 ```
 
 `OrElsePanicWithErr`
@@ -149,9 +133,9 @@ if v == "" {
 opt := goptional.Empty[string]()
 
 // Panic with an error provided by the given supplier if opt is empty.
-v := opt.OrElsePanicWithErr(func() error {
+_ = opt.OrElsePanicWithErr(func() error {
     return errors.New("woops")
-})
+}) // panics
 ```
 
 ### Filtering
@@ -159,17 +143,13 @@ v := opt.OrElsePanicWithErr(func() error {
 ```go
 opt := goptional.Of(123)
 
-// Apply a predicate to the value of opt, if there is any.
+// Apply a predicate to the value of opt, if any.
 opt = opt.Filter(func(v *int) bool { return *v > 100 })
-// Returns an empty Optional, as 123 is not even.
+// Return an empty Optional, as 123 is not even.
 opt = opt.Filter(func(v *int) bool { return *v%2 == 0 })
 
-v := 0
-
-// Is false.
-if opt.IsPresent() {
-    v = opt.Get()
-}
+fmt.Println(opt.IsPresent()) // false
+fmt.Println(opt.Get())       // panics
 ```
 
 ```go
@@ -178,6 +158,8 @@ v := goptional.Of(123).
     Filter(func(v *int) bool { return *v > 100 }).
     Filter(func(v *int) bool { return *v%2 == 0 }).
     OrElse(0)
+
+fmt.Println(v) // 0
 ```
 
 ### Mapping
@@ -187,14 +169,13 @@ v := goptional.Of(123).
 ```go
 opt := goptional.Of(123)
 
-// Apply the given transformation to the value of opt, if there is any,
+// Apply the given transformation to the value of opt, if any,
 // and return a new Optional of the target type.
 strOpt := goptional.Map(opt, func(v *int) string {
     return fmt.Sprintf("%v_mapped", *v)
 })
 
-// v is "123_mapped"
-v := strOpt.OrElse("")
+fmt.Println(strOpt.OrZero()) // 123_mapped
 ```
 
 `MapOr`
@@ -208,8 +189,7 @@ strOpt := goptional.MapOr(opt, func(v *int) string {
     return fmt.Sprintf("%v_mapped", *v)
 }, "default")
 
-// v is "default"
-v := strOpt.OrElse("")
+fmt.Println(strOpt.OrZero()) // default
 ```
 
 `MapOrElse`
@@ -225,8 +205,7 @@ strOpt := goptional.MapOrElse(opt, func(v *int) string {
     return "default"
 })
 
-// v is "default"
-v := strOpt.OrElse("")
+fmt.Println(strOpt.OrZero()) // default
 ```
 
 `FlatMap`
@@ -236,24 +215,34 @@ opt := goptional.Of(123)
 
 // FlatMap is similar to Map, but the given supplier returns an Optional instead.
 // If you are familiar with Monads, think of it as AndThen.
-strOpt := FlatMap(opt, func(v *int) Optional[string] {
+strOpt := goptional.FlatMap(opt, func(v *int) goptional.Optional[string] {
     return goptional.Of(fmt.Sprintf("%v_mapped", *v))
 })
 
-// v is "123_mapped"
-v := strOpt.OrElse("")
+fmt.Println(strOpt.OrZero()) // 123_mapped
 ```
 
 ```go
 opt := goptional.Empty[int]()
 
-// Returns a new empty Optional of the target type, as opt is empty.
-strOpt := FlatMap(opt, func(v *int) Optional[string] {
+// Return a new empty Optional of the target type, as opt is empty.
+strOpt := goptional.FlatMap(opt, func(v *int) goptional.Optional[string] {
     return goptional.Of(fmt.Sprintf("%v_mapped", v))
 })
 
-// v is ""
-v := strOpt.OrElse("")
+fmt.Println(strOpt.OrZero()) // ""
+```
+
+`Flatten`
+
+```go
+opt := goptional.Of(goptional.Of(123))
+
+// Flatten opt by returning the wrapped Optional, if any.
+// Transform Optional[Optional[T]] into Optional[T].
+fOpt := goptional.Flatten(opt)
+
+fmt.Println(fOpt.Get()) // 123
 ```
 
 ### Peeking
@@ -263,10 +252,10 @@ v := strOpt.OrElse("")
 ```go
 opt := goptional.Of(123)
 
-// Execute the given action on the value of opt, if there is any.
+// Execute the given action on the value of opt, if any.
 // Do nothing otherwise.
 opt.IfPresent(func(v *int) {
-    fmt.Println(v) // Prints '123'
+    fmt.Println(v) // 123
 })
 ```
 
@@ -279,7 +268,7 @@ opt := goptional.Empty[int]()
 opt.IfPresentOrElse(func(v *int) {
     // ...
 }, func() {
-    // This block will execute, as 'opt' is empty.
+    // This block will execute, as opt is empty.
 })
 ```
 
@@ -287,7 +276,7 @@ opt.IfPresentOrElse(func(v *int) {
 
 > Think of an *empty* `Optional` as `false` and `true` otherwise.  
 > The suppliers used in the examples below are lazily-evaluated.  
-> If a boolean expression can be *short-circuited*, the supplier is ignored.
+> If a boolean expression can be *short-circuited*, the supplier is *ignored*.
 
 `And`
 
@@ -295,12 +284,11 @@ opt.IfPresentOrElse(func(v *int) {
 opt := goptional.Empty[int]()
 
 // AND between opt & the supplied Optional.
-opt = opt.And(func() Optional[int] {
+opt = opt.And(func() goptional.Optional[int] {
     return goptional.Of(123)
 })
 
-// v is 0
-v := opt.OrElse(0)
+fmt.Println(opt.OrZero()) // 0
 ```
 
 `Or`
@@ -309,12 +297,11 @@ v := opt.OrElse(0)
 opt := goptional.Empty[int]()
 
 // OR between opt & the supplied Optional.
-opt = opt.Or(func() Optional[int] {
+opt = opt.Or(func() goptional.Optional[int] {
     return goptional.Of(123)
 })
 
-// v is 123
-v := opt.OrElse(0)
+fmt.Println(opt.OrZero()) // 123
 ```
 
 `Xor`
@@ -325,8 +312,7 @@ opt := goptional.Empty[int]()
 // XOR between opt & the given Optional.
 opt = opt.Xor(goptional.Of(321))
 
-// v is 321
-v := opt.OrElse(0)
+fmt.Println(opt.OrZero()) // 321
 ```
 
 ### Mutations
@@ -340,13 +326,8 @@ opt1 := goptional.Of(123)
 // and transfer it to opt2 by leaving opt1 empty.
 opt2 := opt1.Take()
 
-// Is true.
-if opt1.IsEmpty() {
-    // ...
-}
-
-// v is 123
-v := opt2.Get()
+fmt.Println(opt1.IsEmpty()) // true
+fmt.Println(opt2.Get())     // 123
 ```
 
 `Replace`
@@ -354,15 +335,19 @@ v := opt2.Get()
 ```go
 opt1 := goptional.Of(123)
 
-// opt1 -> 789, opt2 -> 123
+// Transfer the value of opt1, if any, to opt2 and replace it with 789.
 opt2 := opt1.Replace(789)
+
+fmt.Println(opt1.Get()) // 789
+fmt.Println(opt2.Get()) // 123
 ```
 
 ```go
 opt1 := goptional.Empty[int]()
-
-// opt1 -> 789, opt2 -> Empty
 opt2 := opt1.Replace(789)
+
+fmt.Println(opt1.Get()) // 789
+fmt.Println(opt2.IsEmpty()) // true
 ```
 
 ### JSON
@@ -376,10 +361,15 @@ opt := goptional.Of(123)
 // It returns []byte("null") if called on an empty Optional.
 jsonBytes, err := opt.MarshalJSON()
 
-// Is true.
-if string(jsonBytes) == "123" {
-    // ...
-}
+fmt.Println(err == nil)        // true
+fmt.Println(string(jsonBytes)) // 123
+
+// Make opt empty.
+opt = goptional.Empty[int]()
+jsonBytes, err = opt.MarshalJSON()
+
+fmt.Println(err == nil)        // true
+fmt.Println(string(jsonBytes)) // null
 ```
 
 `UnmarshalJSON`
@@ -390,10 +380,29 @@ numAsJSON := "123"
 
 // Populate opt with the given JSON.
 err := opt.UnmarshalJSON([]byte(numAsJSON))
-if err == nil {
-    // v is 123
-    v := opt.Get()
-}
+
+fmt.Println(err == nil) // true
+fmt.Println(opt.Get())  // 123
+```
+
+### Zipping
+
+`Zip`
+
+```go
+// TODO
+```
+
+`ZipWith`
+
+```go
+// TODO
+```
+
+`Unzip`
+
+```go
+// TODO
 ```
 
 ### String Representation
