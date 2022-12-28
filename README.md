@@ -188,13 +188,13 @@ opt := goptional.Empty[string]()
 fmt.Println(opt.OrDefault()) // ""
 ```
 
-`OrElsePanic`
+`OrPanicWith`
 
 ```go
 opt := goptional.Empty[string]()
 
 // Panic with an error provided by the given supplier if opt is empty.
-_ = opt.OrElsePanic(func() error {
+_ = opt.OrPanicWith(func() error {
     return errors.New("woops")
 }) // panics
 ```

@@ -215,10 +215,10 @@ func (o Optional[T]) OrElseGet(supplier func() T) T {
 	return supplier()
 }
 
-// OrElsePanic returns the value held by this instance, if any, or panics with an error provided by the given supplier otherwise.
+// OrPanicWith returns the value held by this instance, if any, or panics with an error provided by the given supplier otherwise.
 //
 // It panics if this instance is empty and supplier is nil.
-func (o Optional[T]) OrElsePanic(supplier func() error) T {
+func (o Optional[T]) OrPanicWith(supplier func() error) T {
 	if o.IsEmpty() {
 		err := supplier()
 		if err == nil {
