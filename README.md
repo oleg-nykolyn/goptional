@@ -187,13 +187,13 @@ opt2 := goptional.Empty[int]()
 fmt.Println(opt2.Unwrap()) // panics
 ```
 
-`OrPanicWith`
+`UnwrapOr`
 
 ```go
 opt := goptional.Empty[string]()
 
 // Panic with an error provided by the given supplier if opt is empty.
-_ = opt.OrPanicWith(func() error {
+_ = opt.UnwrapOr(func() error {
     return errors.New("woops")
 }) // panics
 ```
