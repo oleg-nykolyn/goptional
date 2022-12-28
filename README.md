@@ -147,8 +147,9 @@ fmt.Println(err) // ouch
 ```go
 opt := goptional.Empty[string]()
 
-// Return the value held by opt, if any, or 
-// the zero value associated with the Optional type (string -> "", int -> 0, bool -> false, ptr -> nil ...)
+// Return the value held by opt, if any,
+// or the zero value associated with the Optional type.
+// string -> "", int -> 0, bool -> false, ptr -> nil ...
 fmt.Println(opt.OrDefault()) // ""
 ```
 
