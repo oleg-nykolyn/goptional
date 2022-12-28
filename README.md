@@ -2,8 +2,6 @@
 
 [![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Go Report Card][rep-img]][rep]
 
-![Header](https://user-images.githubusercontent.com/62895923/209868645-78bb0626-cb30-403a-879b-d2ffdd6b4670.png)
-
 A *comprehensive* implementation of the `Optional` type in Go 🚀
 
 ## Features
