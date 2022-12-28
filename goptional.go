@@ -357,3 +357,54 @@ func Flatten[T any](o Optional[Optional[T]]) Optional[T] {
 	}
 	return Empty[T]()
 }
+
+// Satisfies checks if the value of this instance satisfies the given predicate.
+// If this instance is empty, it returns false.
+//
+// It panics if this instance is not empty and predicate is nil.
+func (o Optional[T]) Satisfies(predicate func(*T) bool) bool {
+	if o.IsEmpty() {
+		return false
+	}
+	v := o.Get()
+	return predicate(&v)
+}
+
+// Val returns the value held by this instance, if any. It returns ErrNoValue otherwise.
+func (o Optional[T]) Val() (T, error) {
+	if o.IsPresent() {
+		return o.Get(), nil
+	}
+	var zero T
+	return zero, ErrNoValue
+}
+
+// ValOr returns the value held by this instance, if any. It returns the given error otherwise.
+//
+// It panics if this instance is empty and err is nil.
+func (o Optional[T]) ValOr(err error) (T, error) {
+	if o.IsPresent() {
+		return o.Get(), nil
+	}
+	var zero T
+	if err == nil {
+		panic("provided err is nil")
+	}
+	return zero, err
+}
+
+// ValOrElse returns the value held by this instance, if any.
+// It returns the error provided by the given supplier otherwise.
+//
+// It panics if this instance is empty and supplier is nil.
+func (o Optional[T]) ValOrElse(supplier func() error) (T, error) {
+	if o.IsPresent() {
+		return o.Get(), nil
+	}
+	var zero T
+	err := supplier()
+	if err == nil {
+		panic("provided err is nil")
+	}
+	return zero, err
+}
