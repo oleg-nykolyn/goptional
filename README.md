@@ -2,7 +2,7 @@
 
 [![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
 
-A *comprehensive* implementation of the `Optional` type in Go.
+A *comprehensive* implementation of the `Optional` type in Go
 
 ## Features
 
@@ -84,19 +84,6 @@ fmt.Println(opt.Equals(opt2)) // false
 
 ### Value Retrieval
 
-`Unwrap`
-
-```go
-opt := goptional.Of(123)
-
-// Retrieve the value held by opt, if any, or panic otherwise.
-fmt.Println((opt.Unwrap())) // 123
-
-opt2 := goptional.Empty[int]()
-
-fmt.Println(opt2.Unwrap()) // panics
-```
-
 `Val`
 
 ```go
@@ -154,6 +141,19 @@ v, err = opt.ValOrElse(extErrSup)
 
 fmt.Println(v)   // 0
 fmt.Println(err) // ouch
+```
+
+`Get`
+
+```go
+opt := goptional.Of(123)
+
+// Retrieve the value held by opt, if any, or panic otherwise.
+fmt.Println((opt.Get())) // 123
+
+opt2 := goptional.Empty[int]()
+
+fmt.Println(opt2.Get()) // panics
 ```
 
 `OrElse`
