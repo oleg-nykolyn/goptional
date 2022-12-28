@@ -44,8 +44,8 @@ fmt.Println(opt2.IsEmpty()) // false
 ```
 
 `Empty`
-> ✍🏼 Note that an empty `Optional` is effectively a `nil` pointer.  
-> Regardless, you can **safely** call any methods on it without expecting a nullptr `panic`.
+> ✍🏼 Note that an empty `Optional` is effectively a `nil` slice.  
+> Regardless, you can **safely** call any methods on it without expecting a `panic`.
 
 ```go
 // Create an empty Optional of type string.
@@ -84,17 +84,17 @@ fmt.Println(opt.Equals(opt2)) // false
 
 ### Value Retrieval
 
-`Get`
+`Unwrap`
 
 ```go
 opt := goptional.Of(123)
 
 // Retrieve the value held by opt, if any, or panic otherwise.
-fmt.Println((opt.Get())) // 123
+fmt.Println((opt.Unwrap())) // 123
 
 opt2 := goptional.Empty[int]()
 
-fmt.Println(opt2.Get()) // panics
+fmt.Println(opt2.Unwrap()) // panics
 ```
 
 `Val`
