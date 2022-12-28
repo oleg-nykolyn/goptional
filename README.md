@@ -6,8 +6,8 @@
 
 ## Features
 
-- Inspired by the [Java](https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/util/Optional.java) & [Rust](https://doc.rust-lang.org/std/option/enum.Option.html) implementations
-- Compatible with all *value* and *reference* types
+- API inspired by the [Java](https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/util/Optional.java) & [Rust](https://doc.rust-lang.org/std/option/enum.Option.html) implementations
+- Compatibility with all *value* and *reference* types
 - Chainable and expressive [generic methods and functions](https://go.dev/doc/tutorial/generics)
 - Null safety *by design*
 
