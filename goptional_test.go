@@ -122,9 +122,6 @@ func TestIfPresent_NilActionOnEmpty(t *testing.T) {
 }
 
 func TestIfPresent_NilActionOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
 	Of([]string{"a", "b", "c"}).IfPresent(nil)
 }
 
@@ -150,23 +147,14 @@ func TestIfPresentOrElse_NotEmpty(t *testing.T) {
 }
 
 func TestIfPresentOrElse_NilActionOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
 	Of(123).IfPresentOrElse(nil, func() {})
 }
 
 func TestIfPresentOrElse_NilEmptyActionOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
 	Empty[string]().IfPresentOrElse(func(_ *string) {}, nil)
 }
 
 func TestIfPresentOrElse_NilEmptyActionOnNilValue(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
 	Of[*string](nil).IfPresentOrElse(func(_ **string) {}, nil)
 }
 
@@ -193,10 +181,8 @@ func TestFilter_NilPredicateOnEmpty(t *testing.T) {
 }
 
 func TestFilter_NilPredicateOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Of(123).Filter(nil)
+	opt := Of(123).Filter(nil)
+	require.True(t, opt.IsEmpty())
 }
 
 func TestFilter_PredicateNotOkOnEmpty(t *testing.T) {
@@ -234,10 +220,7 @@ func TestMap_NotEmpty(t *testing.T) {
 }
 
 func TestMap_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Map[int, string](Of(123), nil)
+	require.True(t, Map[int, string](Of(123), nil).IsEmpty())
 }
 
 func TestMap_NilInput(t *testing.T) {
@@ -273,10 +256,7 @@ func TestMapOr_NotEmpty(t *testing.T) {
 }
 
 func TestMapOr_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	MapOr(Of(123), nil, "default")
+	require.True(t, MapOr(Of(123), nil, "default").IsEmpty())
 }
 
 func TestMapOr_NilInput(t *testing.T) {
@@ -312,10 +292,7 @@ func TestMapOrElse_NotEmpty(t *testing.T) {
 }
 
 func TestMapOrElse_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	MapOrElse(Of(123), nil, func() string { return "default" })
+	require.True(t, MapOrElse(Of(123), nil, func() string { return "default" }).IsEmpty())
 }
 
 func TestMapOrElse_NilInput(t *testing.T) {
@@ -333,10 +310,7 @@ func TestMapOrElse_NilMapperOnNilInput(t *testing.T) {
 }
 
 func TestMapOrElse_NilSupplierOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	MapOrElse(Empty[string](), func(_ *string) int { return 0 }, nil)
+	require.True(t, MapOrElse(Empty[string](), func(_ *string) int { return 0 }, nil).IsEmpty())
 }
 
 func TestFlatMap_Empty(t *testing.T) {
@@ -361,10 +335,7 @@ func TestFlatMap_MapToEmptyOnNotEmpty(t *testing.T) {
 }
 
 func TestFlatMap_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	FlatMap[int, string](Of(123), nil)
+	require.True(t, FlatMap[int, string](Of(123), nil).IsEmpty())
 }
 
 func TestFlatMap_NilInput(t *testing.T) {
@@ -403,10 +374,7 @@ func TestAnd_SuppliedNotEmpty(t *testing.T) {
 }
 
 func TestAnd_NilSupplierOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Of(123).And(nil)
+	require.True(t, Of(123).And(nil).IsEmpty())
 }
 
 func TestOr_NilSupplierOnNotEmpty(t *testing.T) {
@@ -437,10 +405,7 @@ func TestOr_SuppliedEmptyOnEmpty(t *testing.T) {
 }
 
 func TestOr_NilSupplierOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Empty[string]().Or(nil)
+	require.True(t, Empty[string]().Or(nil).IsEmpty())
 }
 
 func TestOrElse_NotEmpty(t *testing.T) {
@@ -464,10 +429,7 @@ func TestOrElseGet_Empty(t *testing.T) {
 }
 
 func TestOrElseGet_NilSupplierOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Empty[string]().OrElseGet(nil)
+	require.Empty(t, Empty[string]().OrElseGet(nil), "")
 }
 
 func TestOrPanicWith_NotEmpty(t *testing.T) {
@@ -882,10 +844,7 @@ func TestZipWith_SomeEmpty(t *testing.T) {
 }
 
 func TestZipWith_NilMapperOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	ZipWith[string, int, interface{}](Of("gm"), Of(123), nil)
+	require.True(t, ZipWith[string, int, interface{}](Of("gm"), Of(123), nil).IsEmpty())
 }
 
 func TestZipWith_BothNotEmpty(t *testing.T) {
@@ -909,10 +868,7 @@ func TestIs_Empty(t *testing.T) {
 }
 
 func TestIs_NilPredicateOnNotEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	Of(123).Is(nil)
+	require.False(t, Of(123).Is(nil))
 }
 
 func TestIs_NotEmpty(t *testing.T) {
@@ -951,10 +907,8 @@ func TestValOr_Empty(t *testing.T) {
 }
 
 func TestValOr_NilErrOnEmpty(t *testing.T) {
-	defer func() {
-		require.EqualValues(t, recover(), "provided err is nil")
-	}()
-	_, _ = Empty[string]().ValOr(nil)
+	_, err := Empty[string]().ValOr(nil)
+	require.ErrorIs(t, err, ErrNoValue)
 }
 
 func TestValOrElse_NotEmpty(t *testing.T) {
@@ -975,15 +929,13 @@ func TestValOrElse_Empty(t *testing.T) {
 }
 
 func TestValOrElse_NilSupplierOnEmpty(t *testing.T) {
-	defer func() {
-		require.NotNil(t, recover())
-	}()
-	_, _ = Empty[string]().ValOrElse(nil)
+	v, err := Empty[string]().ValOrElse(nil)
+	require.EqualValues(t, v, "")
+	require.ErrorIs(t, err, ErrNoValue)
 }
 
 func TestValOrElse_SuppliedNilOnEmpty(t *testing.T) {
-	defer func() {
-		require.EqualValues(t, recover(), "supplied err is nil")
-	}()
-	_, _ = Empty[string]().ValOrElse(func() error { return nil })
+	v, err := Empty[string]().ValOrElse(func() error { return nil })
+	require.EqualValues(t, v, "")
+	require.ErrorIs(t, err, ErrNoValue)
 }
