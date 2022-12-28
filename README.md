@@ -2,7 +2,7 @@
 
 [![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Go Report Card][rep-img]][rep]
 
-![Banner](https://user-images.githubusercontent.com/62895923/209870338-e0716858-78f8-4f16-83a1-a5775b5f84cd.png)
+![Banner](https://user-images.githubusercontent.com/62895923/209871606-7b12bc91-e318-49c3-8637-c616d6853518.png)
 
 ## Features
 
