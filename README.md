@@ -119,23 +119,23 @@ v := opt.OrElseGet(func() string {
 fmt.Println(v) // gm
 ```
 
-`OrZero`
+`OrDefault`
 
 ```go
 opt := goptional.Empty[string]()
 
 // Retrieve the value held by opt, if any, or 
 // the zero value of its type otherwise.
-fmt.Println(opt.OrZero()) // ""
+fmt.Println(opt.OrDefault()) // ""
 ```
 
-`OrElsePanicWithErr`
+`OrElsePanic`
 
 ```go
 opt := goptional.Empty[string]()
 
 // Panic with an error provided by the given supplier if opt is empty.
-_ = opt.OrElsePanicWithErr(func() error {
+_ = opt.OrElsePanic(func() error {
     return errors.New("woops")
 }) // panics
 ```
@@ -177,7 +177,7 @@ strOpt := goptional.Map(opt, func(v *int) string {
     return fmt.Sprintf("%v_mapped", *v)
 })
 
-fmt.Println(strOpt.OrZero()) // 123_mapped
+fmt.Println(strOpt.OrDefault()) // 123_mapped
 ```
 
 `MapOr`
@@ -191,7 +191,7 @@ strOpt := goptional.MapOr(opt, func(v *int) string {
     return fmt.Sprintf("%v_mapped", *v)
 }, "default")
 
-fmt.Println(strOpt.OrZero()) // default
+fmt.Println(strOpt.OrDefault()) // default
 ```
 
 `MapOrElse`
@@ -207,7 +207,7 @@ strOpt := goptional.MapOrElse(opt, func(v *int) string {
     return "default"
 })
 
-fmt.Println(strOpt.OrZero()) // default
+fmt.Println(strOpt.OrDefault()) // default
 ```
 
 `FlatMap`
@@ -221,7 +221,7 @@ strOpt := goptional.FlatMap(opt, func(v *int) goptional.Optional[string] {
     return goptional.Of(fmt.Sprintf("%v_mapped", *v))
 })
 
-fmt.Println(strOpt.OrZero()) // 123_mapped
+fmt.Println(strOpt.OrDefault()) // 123_mapped
 ```
 
 ```go
@@ -232,7 +232,7 @@ strOpt := goptional.FlatMap(opt, func(v *int) goptional.Optional[string] {
     return goptional.Of(fmt.Sprintf("%v_mapped", v))
 })
 
-fmt.Println(strOpt.OrZero()) // ""
+fmt.Println(strOpt.OrDefault()) // ""
 ```
 
 `Flatten`
@@ -290,7 +290,7 @@ opt = opt.And(func() goptional.Optional[int] {
     return goptional.Of(123)
 })
 
-fmt.Println(opt.OrZero()) // 0
+fmt.Println(opt.OrDefault()) // 0
 ```
 
 `Or`
@@ -303,7 +303,7 @@ opt = opt.Or(func() goptional.Optional[int] {
     return goptional.Of(123)
 })
 
-fmt.Println(opt.OrZero()) // 123
+fmt.Println(opt.OrDefault()) // 123
 ```
 
 `Xor`
@@ -314,7 +314,7 @@ opt := goptional.Empty[int]()
 // XOR between opt & the given Optional.
 opt = opt.Xor(goptional.Of(321))
 
-fmt.Println(opt.OrZero()) // 321
+fmt.Println(opt.OrDefault()) // 321
 ```
 
 ### Mutations

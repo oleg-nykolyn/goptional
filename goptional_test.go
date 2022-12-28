@@ -470,11 +470,11 @@ func TestOrElseGet_NilSupplierOnEmpty(t *testing.T) {
 }
 
 func TestOrElsePanicWithErr_NotEmpty(t *testing.T) {
-	require.EqualValues(t, Of(123).OrElsePanicWithErr(func() error { return errors.New("woops") }), 123)
+	require.EqualValues(t, Of(123).OrElsePanic(func() error { return errors.New("woops") }), 123)
 }
 
 func TestOrElsePanicWithErr_NilSupplierOnNotEmpty(t *testing.T) {
-	require.EqualValues(t, Of(123).OrElsePanicWithErr(nil), 123)
+	require.EqualValues(t, Of(123).OrElsePanic(nil), 123)
 }
 
 func TestOrElsePanicWithErr_Empty(t *testing.T) {
@@ -486,7 +486,7 @@ func TestOrElsePanicWithErr_Empty(t *testing.T) {
 		require.Error(t, err)
 		require.EqualError(t, err, "woops")
 	}()
-	Empty[string]().OrElsePanicWithErr(func() error { return errors.New("woops") })
+	Empty[string]().OrElsePanic(func() error { return errors.New("woops") })
 }
 
 func TestOrElsePanicWithErr_SuppliedNilOnEmpty(t *testing.T) {
@@ -497,14 +497,14 @@ func TestOrElsePanicWithErr_SuppliedNilOnEmpty(t *testing.T) {
 		require.True(t, ok)
 		require.ErrorIs(t, err, ErrNoValue)
 	}()
-	Empty[string]().OrElsePanicWithErr(func() error { return nil })
+	Empty[string]().OrElsePanic(func() error { return nil })
 }
 
 func TestOrElsePanicWithErr_NilSupplierOnEmpty(t *testing.T) {
 	defer func() {
 		require.NotNil(t, recover())
 	}()
-	Empty[string]().OrElsePanicWithErr(nil)
+	Empty[string]().OrElsePanic(nil)
 }
 
 func TestXor_NilOptOnEmpty(t *testing.T) {
@@ -633,21 +633,21 @@ func TestEquals_NotEqualValuesComposite(t *testing.T) {
 }
 
 func TestOrZero_Empty(t *testing.T) {
-	assert.EqualValues(t, Empty[string]().OrZero(), "")
-	assert.False(t, Empty[bool]().OrZero())
-	assert.Nil(t, Empty[*string]().OrZero())
-	assert.EqualValues(t, Empty[int]().OrZero(), 0)
-	assert.Nil(t, Empty[[]string]().OrZero())
+	assert.EqualValues(t, Empty[string]().OrDefault(), "")
+	assert.False(t, Empty[bool]().OrDefault())
+	assert.Nil(t, Empty[*string]().OrDefault())
+	assert.EqualValues(t, Empty[int]().OrDefault(), 0)
+	assert.Nil(t, Empty[[]string]().OrDefault())
 }
 
 func TestOrZero_NotEmpty(t *testing.T) {
-	assert.EqualValues(t, Of("abc").OrZero(), "abc")
-	assert.True(t, Of(true).OrZero())
+	assert.EqualValues(t, Of("abc").OrDefault(), "abc")
+	assert.True(t, Of(true).OrDefault())
 	s := "abc"
-	assert.EqualValues(t, Of(&s).OrZero(), &s)
-	assert.EqualValues(t, Of(123).OrZero(), 123)
+	assert.EqualValues(t, Of(&s).OrDefault(), &s)
+	assert.EqualValues(t, Of(123).OrDefault(), 123)
 	v := []string{"a", "b", "c"}
-	assert.EqualValues(t, Of(v).OrZero(), v)
+	assert.EqualValues(t, Of(v).OrDefault(), v)
 }
 
 func TestTake_Empty(t *testing.T) {
