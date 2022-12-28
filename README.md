@@ -390,13 +390,42 @@ fmt.Println(opt.Get())  // 123
 `Zip`
 
 ```go
-// TODO
+opt1 := goptional.Of(123)
+opt2 := goptional.Of("gm")
+
+// Zip opt1 & opt2 and return a non-empty Optional Pair.
+optPair := goptional.Zip(opt1, opt2)
+
+fmt.Println(optPair.IsPresent()) // true
+
+pair := optPair.Get()
+fmt.Println(pair.First)  // 123
+fmt.Println(pair.Second) // gm
+
+// Return an empty Optional Pair if at least one of the arguments to Zip is an empty Optional.
+optPair = goptional.Zip(opt1, goptional.Empty[string]())
+
+fmt.Println(optPair.IsEmpty()) // true
 ```
 
 `ZipWith`
 
 ```go
-// TODO
+opt1 := goptional.Of(123)
+opt2 := goptional.Of("gm")
+mapper := func(x *int, y *string) string {
+    return fmt.Sprintf("%v_%v", *x, *y)
+}
+// Zip opt1 & opt2 with the given mapper and return a non-empty Optional of the target type.
+opt3 := goptional.ZipWith(opt1, opt2, mapper)
+
+fmt.Println(opt3.IsPresent()) // true
+fmt.Println(opt3.Get())       // 123_gm
+
+// Return an empty Optional as one of the arguments to ZipWith is an empty Optional.
+opt3 = goptional.ZipWith(opt1, goptional.Empty[string](), mapper)
+
+fmt.Println(opt3.IsEmpty()) // true
 ```
 
 `Unzip`
