@@ -6,7 +6,7 @@
 
 ## Features
 
-- A recognizablle API that is *heavily* inspired by the [Java](https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/util/Optional.java) & [Rust](https://doc.rust-lang.org/std/option/enum.Option.html) implementations
+- An API inspired by the [Java](https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/util/Optional.java) & [Rust](https://doc.rust-lang.org/std/option/enum.Option.html) implementations
 - Compatible with all *value* and *reference* types
 - Chainable and expressive [generic methods and functions](https://go.dev/doc/tutorial/generics)
 - Minimal overhead - `Optional` is just a singleton slice
@@ -95,6 +95,65 @@ fmt.Println((opt.Get())) // 123
 opt2 := goptional.Empty[int]()
 
 fmt.Println(opt2.Get()) // panics
+```
+
+`Val`
+
+```go
+opt := goptional.Of(123)
+
+// Return the value from opt, if any, or a NoValErr otherwise.
+v, err := opt.Val()
+
+fmt.Println(v)   // 123
+fmt.Println(err) // nil
+
+// Reassign opt to empty.
+opt = goptional.Empty[int]()
+v, err = opt.Val()
+
+fmt.Println(v)   // 0
+fmt.Println(err) // no value present
+```
+
+`ValOr`
+
+```go
+opt := goptional.Of(123)
+extErr := errors.New("woops")
+
+// Return the value from opt, if any, or the given error otherwise.
+v, err := opt.ValOr(extErr)
+
+fmt.Println(v)   // 123
+fmt.Println(err) // nil
+
+// Reassign opt to empty.
+opt = goptional.Empty[int]()
+v, err = opt.ValOr(extErr)
+
+fmt.Println(v)   // 0
+fmt.Println(err) // woops
+```
+
+`ValOrElse`
+
+```go
+opt := goptional.Of(123)
+extErrSup := func() error { return errors.New("ouch") }
+
+// Return the value from opt, if any, or the error provided by the given supplier otherwise.
+v, err := opt.ValOrElse(extErrSup)
+
+fmt.Println(v)   // 123
+fmt.Println(err) // nil
+
+// Reassign opt to empty.
+opt = goptional.Empty[int]()
+v, err = opt.ValOrElse(extErrSup)
+
+fmt.Println(v)   // 0
+fmt.Println(err) // ouch
 ```
 
 `OrElse`
@@ -272,6 +331,19 @@ opt.IfPresentOrElse(func(v *int) {
 }, func() {
     // This block will execute, as opt is empty.
 })
+```
+
+`Is`
+
+```go
+opt := goptional.Of(124)
+// Check if the given predicate satisfies the value of opt, if any.
+isEven := opt.Is(func(x *int) bool { return *x%2 == 0 })
+
+fmt.Println(isEven) // true
+
+// Always return false if an Optional is empty, regardless of the predicate.
+fmt.Println(goptional.Empty[int]().Is(nil)) // false
 ```
 
 ### Boolean Operators

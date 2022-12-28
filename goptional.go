@@ -1,7 +1,3 @@
-/*
-Package goptional implements the Optional type, its methods and functions.
-The API is heavily inspired by the Java & Rust implementations.
-*/
 package goptional
 
 import (
@@ -358,11 +354,11 @@ func Flatten[T any](o Optional[Optional[T]]) Optional[T] {
 	return Empty[T]()
 }
 
-// Satisfies checks if the value of this instance satisfies the given predicate.
+// Is checks if the value of this instance satisfies the given predicate.
 // If this instance is empty, it returns false.
 //
 // It panics if this instance is not empty and predicate is nil.
-func (o Optional[T]) Satisfies(predicate func(*T) bool) bool {
+func (o Optional[T]) Is(predicate func(*T) bool) bool {
 	if o.IsEmpty() {
 		return false
 	}
