@@ -39,6 +39,8 @@ opt := goptional.Of(123)
 
 // 💡 Return an empty Optional if the argument to Of is either nil or invalid.
 opt2 := goptional.Of[[]string](nil)
+
+fmt.Println(opt2.IsEmpty()) // false
 ```
 
 `Empty`
@@ -52,7 +54,7 @@ opt := goptional.Empty[string]()
 fmt.Println(opt)        // Optional.empty
 fmt.Println(opt == nil) // true
 
-// This does not panic.
+// 💡 This does not panic.
 fmt.Println(opt.IsPresent()) // false
 ```
 
@@ -460,7 +462,7 @@ fmt.Println(opt2.IsEmpty()) // true
 ##  FAQ
 
 1. **Why are `Map`, `MapOr`, etc. implemented as functions and not methods?**  
-As of now, Go does **not** support method-level type parameters. This might change in the future.
+As of now, Go [does not support](https://github.com/golang/go/issues/49085) method-level type parameters. This might change in the future.
 
 ## Testing
 
