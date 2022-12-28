@@ -371,6 +371,7 @@ func (o Optional[T]) Val() (T, error) {
 	if o.IsPresent() {
 		return o.Get(), nil
 	}
+
 	var zero T
 	return zero, ErrNoValue
 }
@@ -382,6 +383,7 @@ func (o Optional[T]) ValOr(err error) (T, error) {
 	if o.IsPresent() {
 		return o.Get(), nil
 	}
+
 	var zero T
 	if err == nil {
 		panic("provided err is nil")
@@ -397,6 +399,7 @@ func (o Optional[T]) ValOrElse(supplier func() error) (T, error) {
 	if o.IsPresent() {
 		return o.Get(), nil
 	}
+
 	var zero T
 	err := supplier()
 	if err == nil {
