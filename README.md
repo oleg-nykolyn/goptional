@@ -37,7 +37,7 @@ import "github.com/nykolynoleg/goptional"
 // Create an Optional of type int that holds 123.
 opt := goptional.Of(123)
 
-// 💡 If the argument to Of is either nil or invalid, return an empty Optional instead.
+// 💡 Return an empty Optional if the argument to Of is either nil or invalid.
 opt2 := goptional.Of[[]string](nil)
 ```
 
@@ -365,7 +365,7 @@ fmt.Println(string(jsonBytes)) // 123
 
 // Reassign opt to empty.
 opt = goptional.Empty[int]()
-// Return []byte("null") as opt is empty.
+// Return []byte("null") as opt is now empty.
 jsonBytes, err = opt.MarshalJSON()
 
 fmt.Println(err == nil)        // true
