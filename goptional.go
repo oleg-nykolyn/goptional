@@ -32,7 +32,7 @@ func Empty[T any]() *Optional[T] {
 
 // Of returns a new Optional that holds the given value.
 // It returns an empty Optional if the given value is either invalid or nil.
-func Of[T any](value T) (opt *Optional[T]) {
+func Of[T any](value T) *Optional[T] {
 	v := reflect.ValueOf(value)
 	if !v.IsValid() {
 		return Empty[T]()
