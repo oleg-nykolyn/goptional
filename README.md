@@ -43,8 +43,8 @@ fmt.Println(opt2.IsEmpty()) // true
 ```
 
 `Empty`
-> ✍🏼 Note that a nil `*Optional[T]` instance is considered *empty*.
-> Thus, you can safely call any methods and functions on it without incurring into `panic`s.
+> 💡 You can *safely* call any methods and functions
+> on a nil `*Optional[T]` instance as it is considered *empty* by design.
 
 ```go
 // Create an empty Optional of type string.
