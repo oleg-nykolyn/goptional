@@ -43,18 +43,12 @@ fmt.Println(opt2.IsEmpty()) // true
 ```
 
 `Empty`
-> ✍🏼 Note that an empty `Optional` is effectively a `nil` slice.  
-> Regardless, you can **safely** call any methods on it without expecting a `panic`.
+> ✍🏼 Note that a nil `*Optional[T]` instance is considered *empty*.
+> Thus, you can safely call any methods and functions on it without incurring into `panic`s.
 
 ```go
 // Create an empty Optional of type string.
 opt := goptional.Empty[string]()
-
-fmt.Println(opt)        // Optional.empty
-fmt.Println(opt == nil) // true
-
-// 💡 This does not panic.
-fmt.Println(opt.IsPresent()) // false
 ```
 
 ### Presence
@@ -276,7 +270,7 @@ opt := goptional.Of(123)
 
 // FlatMap is similar to Map, but the given supplier returns an Optional instead.
 // If you are familiar with Monads, think of it as AndThen.
-strOpt := goptional.FlatMap(opt, func(v *int) goptional.Optional[string] {
+strOpt := goptional.FlatMap(opt, func(v *int) *goptional.Optional[string] {
     return goptional.Of(fmt.Sprintf("%v_mapped", *v))
 })
 
@@ -287,7 +281,7 @@ fmt.Println(strOpt.OrDefault()) // 123_mapped
 opt := goptional.Empty[int]()
 
 // Return a new empty Optional of the target type, as opt is empty.
-strOpt := goptional.FlatMap(opt, func(v *int) goptional.Optional[string] {
+strOpt := goptional.FlatMap(opt, func(v *int) *goptional.Optional[string] {
     return goptional.Of(fmt.Sprintf("%v_mapped", v))
 })
 
@@ -316,7 +310,7 @@ opt := goptional.Of(123)
 // Execute the given action on the value of opt, if any.
 // Do nothing otherwise.
 opt.IfPresent(func(v *int) {
-    fmt.Println(v) // 123
+    fmt.Println(*v) // 123
 })
 ```
 
@@ -358,7 +352,7 @@ fmt.Println(goptional.Empty[int]().Is(nil)) // false
 opt := goptional.Empty[int]()
 
 // AND between opt & the supplied Optional.
-opt = opt.And(func() goptional.Optional[int] {
+opt = opt.And(func() *goptional.Optional[int] {
     return goptional.Of(123)
 })
 
@@ -371,7 +365,7 @@ fmt.Println(opt.OrDefault()) // 0
 opt := goptional.Empty[int]()
 
 // OR between opt & the supplied Optional.
-opt = opt.Or(func() goptional.Optional[int] {
+opt = opt.Or(func() *goptional.Optional[int] {
     return goptional.Of(123)
 })
 
@@ -410,15 +404,17 @@ fmt.Println(opt2.Unwrap())  // 123
 opt1 := goptional.Of(123)
 
 // Transfer the value of opt1, if any, to opt2 and replace it with 789.
-opt2 := opt1.Replace(789)
+// Return an error otherwise.
+opt2, err := opt1.Replace(789)
 
+fmt.Println(err)           // nil
 fmt.Println(opt1.Unwrap()) // 789
 fmt.Println(opt2.Unwrap()) // 123
 ```
 
 ```go
 opt1 := goptional.Empty[int]()
-opt2 := opt1.Replace(789)
+opt2, _ := opt1.Replace(789)
 
 fmt.Println(opt1.Unwrap())  // 789
 fmt.Println(opt2.IsEmpty()) // true
@@ -506,7 +502,7 @@ fmt.Println(opt3.IsEmpty()) // true
 
 ```go
 // Create a Pair of Optionals.
-pair := goptional.Pair[goptional.Optional[int], goptional.Optional[string]]{
+pair := goptional.Pair[*goptional.Optional[int], *goptional.Optional[string]]{
     First:  goptional.Of(123),
     Second: goptional.Of("gm"),
 }
@@ -518,7 +514,7 @@ fmt.Println(opt1.Unwrap()) // 123
 fmt.Println(opt2.Unwrap()) // gm
 
 // Create an empty Optional Pair.
-emptyPair := goptional.Empty[*goptional.Pair[goptional.Optional[int], goptional.Optional[string]]]()
+emptyPair := goptional.Empty[*goptional.Pair[*goptional.Optional[int], *goptional.Optional[string]]]()
 
 // Return two empty Optionals if the given Optional is empty.
 opt1, opt2 = goptional.Unzip(emptyPair)
