@@ -37,6 +37,7 @@ func Of[T any](value T) (opt *Optional[T]) {
 	if !v.IsValid() {
 		return Empty[T]()
 	}
+
 	switch v.Kind() {
 	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
 		if v.IsNil() {
@@ -121,6 +122,7 @@ func Map[X, Y any](input *Optional[X], mapper func(*X) Y) *Optional[Y] {
 	if input.IsEmpty() || mapper == nil {
 		return Empty[Y]()
 	}
+
 	v := input.Unwrap()
 	return Of(mapper(&v))
 }
@@ -213,6 +215,7 @@ func (o *Optional[T]) Xor(o2 *Optional[T]) *Optional[T] {
 	if (o.IsPresent() && o2.IsPresent()) || (o.IsEmpty() && o2.IsEmpty()) {
 		return Empty[T]()
 	}
+
 	if o.IsPresent() {
 		return o
 	}
@@ -248,7 +251,6 @@ func (o *Optional[T]) OrElseGet(supplier func() T) T {
 		var zero T
 		return zero
 	}
-
 	return supplier()
 }
 
@@ -267,7 +269,6 @@ func (o *Optional[T]) UnwrapOr(supplier func() error) T {
 			panic(ErrNoValue)
 		}
 	}
-
 	return o.Unwrap()
 }
 
@@ -278,6 +279,7 @@ func (o *Optional[T]) Equals(o2 *Optional[T]) bool {
 	if !o.IsPresent() && !o2.IsPresent() {
 		return true
 	}
+
 	if o.IsPresent() && o2.IsPresent() {
 		return reflect.DeepEqual(o.Unwrap(), o2.Unwrap())
 	}
@@ -299,6 +301,7 @@ func (o *Optional[T]) UnmarshalJSON(data []byte) error {
 	if o == nil {
 		return ErrMutationOnNil
 	}
+
 	if len(data) == 0 || bytes.Equal(data, nilAsJSON) {
 		o.wrapped = nil
 		return nil
@@ -327,6 +330,7 @@ func (o *Optional[T]) Take() *Optional[T] {
 	if o.IsEmpty() {
 		return o
 	}
+
 	v := o.Unwrap()
 	o.wrapped = nil
 	return Of(v)
@@ -339,10 +343,12 @@ func (o *Optional[T]) Replace(value T) (*Optional[T], error) {
 	if o == nil {
 		return nil, ErrMutationOnNil
 	}
+
 	if o.wrapped == nil {
 		o.wrapped = &valueWrapper[T]{value: value}
 		return Empty[T](), nil
 	}
+
 	v := o.Unwrap()
 	o.wrapped = &valueWrapper[T]{value: value}
 	return Of(v), nil
@@ -364,6 +370,7 @@ func Zip[X, Y any](o1 *Optional[X], o2 *Optional[Y]) *Optional[*Pair[X, Y]] {
 	if o1.IsPresent() && o2.IsPresent() {
 		return Of(&Pair[X, Y]{First: o1.Unwrap(), Second: o2.Unwrap()})
 	}
+
 	return Empty[*Pair[X, Y]]()
 }
 
@@ -412,6 +419,7 @@ func (o *Optional[T]) Is(predicate func(*T) bool) bool {
 	if o.IsEmpty() || predicate == nil {
 		return false
 	}
+
 	v := o.Unwrap()
 	return predicate(&v)
 }
