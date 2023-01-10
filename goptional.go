@@ -71,18 +71,18 @@ func (o *Optional[T]) Unwrap() T {
 
 // IfPresent applies the action to the value held by this instance.
 // Does nothing if this instance is empty. If action is nil, nothing is done.
-func (o *Optional[T]) IfPresent(action func(*T)) {
+func (o *Optional[T]) IfPresent(action func(T)) {
 	if o.IsPresent() && action != nil {
-		action(o.getValueAddr())
+		action(o.Unwrap())
 	}
 }
 
 // IfPresentOrElse applies the action to the value held by this instance or calls emptyAction if this instance is empty.
 // If action or emptyAction are nil, nothing is done.
-func (o *Optional[T]) IfPresentOrElse(action func(*T), emptyAction func()) {
+func (o *Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
 	if o.IsPresent() {
 		if action != nil {
-			action(o.getValueAddr())
+			action(o.Unwrap())
 		}
 	} else {
 		if emptyAction != nil {
@@ -94,7 +94,7 @@ func (o *Optional[T]) IfPresentOrElse(action func(*T), emptyAction func()) {
 // Filter returns self if self is empty or
 // if the predicate applied to its value returns false.
 // If this instance is not empty and predicate is nil, it returns an empty Optional.
-func (o *Optional[T]) Filter(predicate func(*T) bool) *Optional[T] {
+func (o *Optional[T]) Filter(predicate func(T) bool) *Optional[T] {
 	if o.IsEmpty() {
 		return o
 	}
@@ -103,7 +103,7 @@ func (o *Optional[T]) Filter(predicate func(*T) bool) *Optional[T] {
 		return Empty[T]()
 	}
 
-	if predicate(o.getValueAddr()) {
+	if predicate(o.Unwrap()) {
 		return o
 	}
 
@@ -115,17 +115,17 @@ func (o *Optional[T]) Filter(predicate func(*T) bool) *Optional[T] {
 //   - a new Optional holding a value that results from the application of the given mapper to the value of input
 //
 // If this instance is not empty and mapper is nil, it returns an empty Optional of the target type.
-func Map[X, Y any](input *Optional[X], mapper func(*X) Y) *Optional[Y] {
+func Map[X, Y any](input *Optional[X], mapper func(X) Y) *Optional[Y] {
 	if input.IsEmpty() || mapper == nil {
 		return Empty[Y]()
 	}
 
-	return Of(mapper(input.getValueAddr()))
+	return Of(mapper(input.Unwrap()))
 }
 
 // MapOr is similar to Map, but if input is empty, it returns a new Optional holding a default value instead.
 // If this instance is not empty and mapper is nil, it returns an empty Optional of the target type.
-func MapOr[X, Y any](input *Optional[X], mapper func(*X) Y, other Y) *Optional[Y] {
+func MapOr[X, Y any](input *Optional[X], mapper func(X) Y, other Y) *Optional[Y] {
 	if input.IsEmpty() {
 		return Of(other)
 	}
@@ -134,7 +134,7 @@ func MapOr[X, Y any](input *Optional[X], mapper func(*X) Y, other Y) *Optional[Y
 		return Empty[Y]()
 	}
 
-	return Of(mapper(input.getValueAddr()))
+	return Of(mapper(input.Unwrap()))
 }
 
 // MapOrElse is similar to MapOr, but if input is empty, it returns a new Optional holding the value provided by the given supplier.
@@ -144,7 +144,7 @@ func MapOr[X, Y any](input *Optional[X], mapper func(*X) Y, other Y) *Optional[Y
 //   - this instance holds a value and mapper is nil
 //
 // then it returns an empty Optional of the target type.
-func MapOrElse[X, Y any](input *Optional[X], mapper func(*X) Y, supplier func() Y) *Optional[Y] {
+func MapOrElse[X, Y any](input *Optional[X], mapper func(X) Y, supplier func() Y) *Optional[Y] {
 	if input.IsEmpty() {
 		if supplier != nil {
 			return Of(supplier())
@@ -156,7 +156,7 @@ func MapOrElse[X, Y any](input *Optional[X], mapper func(*X) Y, supplier func() 
 		return Empty[Y]()
 	}
 
-	return Of(mapper(input.getValueAddr()))
+	return Of(mapper(input.Unwrap()))
 }
 
 // FlatMap returns one of the following:
@@ -164,12 +164,12 @@ func MapOrElse[X, Y any](input *Optional[X], mapper func(*X) Y, supplier func() 
 //   - a new Optional that results from the application of the given mapper to the value of input
 //
 // If this instance is not empty and mapper is nil, it returns an empty Optional of the target type.
-func FlatMap[X, Y any](input *Optional[X], mapper func(*X) *Optional[Y]) *Optional[Y] {
+func FlatMap[X, Y any](input *Optional[X], mapper func(X) *Optional[Y]) *Optional[Y] {
 	if input.IsEmpty() || mapper == nil {
 		return Empty[Y]()
 	}
 
-	return mapper(input.getValueAddr())
+	return mapper(input.Unwrap())
 }
 
 // And returns one of the following:
@@ -383,15 +383,13 @@ func Unzip[X, Y any](o *Optional[*Pair[*Optional[X], *Optional[Y]]]) (*Optional[
 // Otherwise, an empty Optional is returned.
 //
 // It o1 & o2 are both non-empty and mapper is nil, it returns an empty Optional of the target type.
-func ZipWith[X, Y, Z any](o1 *Optional[X], o2 *Optional[Y], mapper func(*X, *Y) Z) *Optional[Z] {
+func ZipWith[X, Y, Z any](o1 *Optional[X], o2 *Optional[Y], mapper func(X, Y) Z) *Optional[Z] {
 	if o1.IsPresent() && o2.IsPresent() {
 		if mapper == nil {
 			return Empty[Z]()
 		}
 
-		v1 := o1.Unwrap()
-		v2 := o2.Unwrap()
-		return Of(mapper(&v1, &v2))
+		return Of(mapper(o1.Unwrap(), o2.Unwrap()))
 	}
 	return Empty[Z]()
 }
@@ -408,12 +406,12 @@ func Flatten[T any](o *Optional[*Optional[T]]) *Optional[T] {
 // If this instance is empty, it returns false.
 //
 // If this instance is not empty and predicate is nil, it returns false.
-func (o *Optional[T]) Is(predicate func(*T) bool) bool {
+func (o *Optional[T]) Is(predicate func(T) bool) bool {
 	if o.IsEmpty() || predicate == nil {
 		return false
 	}
 
-	return predicate(o.getValueAddr())
+	return predicate(o.Unwrap())
 }
 
 // Val returns the value held by this instance, if any. It returns ErrNoValue otherwise.
@@ -460,8 +458,4 @@ func (o *Optional[T]) ValOrElse(supplier func() error) (T, error) {
 	}
 
 	return zero, err
-}
-
-func (o *Optional[T]) getValueAddr() *T {
-	return &o.wrapped.value
 }
