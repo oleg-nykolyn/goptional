@@ -73,8 +73,7 @@ func (o *Optional[T]) Unwrap() T {
 // Does nothing if this instance is empty. If action is nil, nothing is done.
 func (o *Optional[T]) IfPresent(action func(*T)) {
 	if o.IsPresent() && action != nil {
-		v := o.Unwrap()
-		action(&v)
+		action(o.getValueAddr())
 	}
 }
 
@@ -83,8 +82,7 @@ func (o *Optional[T]) IfPresent(action func(*T)) {
 func (o *Optional[T]) IfPresentOrElse(action func(*T), emptyAction func()) {
 	if o.IsPresent() {
 		if action != nil {
-			v := o.Unwrap()
-			action(&v)
+			action(o.getValueAddr())
 		}
 	} else {
 		if emptyAction != nil {
@@ -105,8 +103,7 @@ func (o *Optional[T]) Filter(predicate func(*T) bool) *Optional[T] {
 		return Empty[T]()
 	}
 
-	v := o.Unwrap()
-	if predicate(&v) {
+	if predicate(o.getValueAddr()) {
 		return o
 	}
 
@@ -123,8 +120,7 @@ func Map[X, Y any](input *Optional[X], mapper func(*X) Y) *Optional[Y] {
 		return Empty[Y]()
 	}
 
-	v := input.Unwrap()
-	return Of(mapper(&v))
+	return Of(mapper(input.getValueAddr()))
 }
 
 // MapOr is similar to Map, but if input is empty, it returns a new Optional holding a default value instead.
@@ -138,8 +134,7 @@ func MapOr[X, Y any](input *Optional[X], mapper func(*X) Y, other Y) *Optional[Y
 		return Empty[Y]()
 	}
 
-	v := input.Unwrap()
-	return Of(mapper(&v))
+	return Of(mapper(input.getValueAddr()))
 }
 
 // MapOrElse is similar to MapOr, but if input is empty, it returns a new Optional holding the value provided by the given supplier.
@@ -161,8 +156,7 @@ func MapOrElse[X, Y any](input *Optional[X], mapper func(*X) Y, supplier func() 
 		return Empty[Y]()
 	}
 
-	v := input.Unwrap()
-	return Of(mapper(&v))
+	return Of(mapper(input.getValueAddr()))
 }
 
 // FlatMap returns one of the following:
@@ -175,8 +169,7 @@ func FlatMap[X, Y any](input *Optional[X], mapper func(*X) *Optional[Y]) *Option
 		return Empty[Y]()
 	}
 
-	v := input.Unwrap()
-	return mapper(&v)
+	return mapper(input.getValueAddr())
 }
 
 // And returns one of the following:
@@ -420,8 +413,7 @@ func (o *Optional[T]) Is(predicate func(*T) bool) bool {
 		return false
 	}
 
-	v := o.Unwrap()
-	return predicate(&v)
+	return predicate(o.getValueAddr())
 }
 
 // Val returns the value held by this instance, if any. It returns ErrNoValue otherwise.
@@ -468,4 +460,8 @@ func (o *Optional[T]) ValOrElse(supplier func() error) (T, error) {
 	}
 
 	return zero, err
+}
+
+func (o *Optional[T]) getValueAddr() *T {
+	return &o.wrapped.value
 }
