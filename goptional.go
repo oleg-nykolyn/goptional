@@ -338,7 +338,7 @@ func (o *Optional[T]) Take() *Optional[T] {
 
 // Replace replaces the value in this instance with the given value,
 // returning the old value if present, leaving a non-empty Optional in its place
-// without deinitializing either one. Tt returns an ErrMutationOnNil error otherwise.
+// without deinitializing either one. It returns an ErrMutationOnNil error otherwise.
 func (o *Optional[T]) Replace(value T) (*Optional[T], error) {
 	if o == nil {
 		return nil, ErrMutationOnNil
