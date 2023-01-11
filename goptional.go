@@ -219,7 +219,7 @@ func (o *Optional[T]) Xor(o2 *Optional[T]) *Optional[T] {
 // OrDefault returns the value held by this instance, if any, or the zero value of T otherwise.
 func (o *Optional[T]) OrDefault() T {
 	if o.IsEmpty() {
-		return o.value
+		return o.getZeroValue()
 	}
 
 	return o.Unwrap()
@@ -243,7 +243,7 @@ func (o *Optional[T]) OrElseGet(supplier func() T) T {
 	}
 
 	if supplier == nil {
-		return o.value
+		return o.getZeroValue()
 	}
 
 	return supplier()
@@ -429,7 +429,7 @@ func (o *Optional[T]) Val() (T, error) {
 		return o.Unwrap(), nil
 	}
 
-	return o.value, ErrNoValue
+	return o.getZeroValue(), ErrNoValue
 }
 
 // ValOr returns the value held by this instance, if any. It returns the given error otherwise.
@@ -440,10 +440,10 @@ func (o *Optional[T]) ValOr(err error) (T, error) {
 	}
 
 	if err == nil {
-		return o.value, ErrNoValue
+		return o.getZeroValue(), ErrNoValue
 	}
 
-	return o.value, err
+	return o.getZeroValue(), err
 }
 
 // ValOrElse returns the value held by this instance, if any.
@@ -456,13 +456,13 @@ func (o *Optional[T]) ValOrElse(supplier func() error) (T, error) {
 	}
 
 	if supplier == nil {
-		return o.value, ErrNoValue
+		return o.getZeroValue(), ErrNoValue
 	}
 
 	if err := supplier(); err != nil {
-		return o.value, err
+		return o.getZeroValue(), err
 	} else {
-		return o.value, ErrNoValue
+		return o.getZeroValue(), ErrNoValue
 	}
 }
 
@@ -475,4 +475,9 @@ func (o *Optional[T]) unsetValue() {
 func (o *Optional[T]) setValue(value T) {
 	o.value = value
 	o.hasValue = true
+}
+
+func (o *Optional[T]) getZeroValue() T {
+	var zero T
+	return zero
 }

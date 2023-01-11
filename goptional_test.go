@@ -639,6 +639,9 @@ func TestEquals_NotEqualValuesComposite(t *testing.T) {
 }
 
 func TestOrDefault_Empty(t *testing.T) {
+	var opt *Optional[string]
+	assert.EqualValues(t, opt.OrDefault(), "")
+
 	assert.EqualValues(t, Empty[string]().OrDefault(), "")
 	assert.False(t, Empty[bool]().OrDefault())
 	assert.Nil(t, Empty[*string]().OrDefault())
@@ -1007,4 +1010,9 @@ func TestValOrElse_SuppliedNilOnEmpty(t *testing.T) {
 	v, err := Empty[string]().ValOrElse(func() error { return nil })
 	require.EqualValues(t, v, "")
 	require.ErrorIs(t, err, ErrNoValue)
+}
+
+func TestGetZeroValue_Nil(t *testing.T) {
+	var opt *Optional[string]
+	require.EqualValues(t, opt.getZeroValue(), "")
 }
