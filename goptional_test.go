@@ -26,16 +26,22 @@ func TestOf_ValidValue(t *testing.T) {
 }
 
 func TestOf_InvalidValue(t *testing.T) {
-	require.True(t, Of[interface{}](nil).IsEmpty())
+	opt := Of[interface{}](nil)
+	require.Empty(t, opt.value)
+	require.False(t, opt.hasValue)
 }
 
 func TestOf_NilValue(t *testing.T) {
-	require.True(t, Of[*string](nil).IsEmpty())
+	opt := Of[*string](nil)
+	require.Empty(t, opt.value)
+	require.False(t, opt.hasValue)
 }
 
 func TestIsPresent_Empty(t *testing.T) {
 	opt := Empty[string]()
 	require.False(t, opt.IsPresent())
+	require.Empty(t, opt.value)
+	require.False(t, opt.hasValue)
 
 	opt = nil
 	require.False(t, opt.IsPresent())
@@ -44,26 +50,36 @@ func TestIsPresent_Empty(t *testing.T) {
 func TestIsPresent_ZeroInst(t *testing.T) {
 	var opt Optional[string]
 	require.False(t, opt.IsPresent())
+	require.Empty(t, opt.value)
+	require.False(t, opt.hasValue)
 }
 
 func TestIsPresent_NilValue(t *testing.T) {
 	opt := Of[map[string]interface{}](nil)
 	require.False(t, opt.IsPresent())
+	require.Empty(t, opt.value)
+	require.False(t, opt.hasValue)
 }
 
 func TestIsPresent_NotEmpty(t *testing.T) {
 	opt := Of("goptional")
 	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.value, "goptional")
+	require.True(t, opt.hasValue)
 }
 
 func TestIsPresent_ZeroValue(t *testing.T) {
 	opt := Of("")
 	require.True(t, opt.IsPresent())
+	require.EqualValues(t, opt.value, "")
+	require.True(t, opt.hasValue)
 }
 
 func TestIsEmpty_Empty(t *testing.T) {
 	opt := Empty[string]()
 	require.True(t, opt.IsEmpty())
+	require.Empty(t, opt.value)
+	require.False(t, opt.hasValue)
 
 	opt = nil
 	require.True(t, opt.IsEmpty())
@@ -72,21 +88,29 @@ func TestIsEmpty_Empty(t *testing.T) {
 func TestIsEmpty_NilValue(t *testing.T) {
 	opt := Of[map[string]interface{}](nil)
 	require.True(t, opt.IsEmpty())
+	require.Empty(t, opt.value)
+	require.False(t, opt.hasValue)
 }
 
 func TestIsEmpty_ZeroInst(t *testing.T) {
 	var opt Optional[string]
 	require.True(t, opt.IsEmpty())
+	require.Empty(t, opt.value)
+	require.False(t, opt.hasValue)
 }
 
 func TestIsEmpty_NotEmpty(t *testing.T) {
 	opt := Of("goptional")
 	require.False(t, opt.IsEmpty())
+	require.EqualValues(t, opt.value, "goptional")
+	require.True(t, opt.hasValue)
 }
 
 func TestIsEmpty_ZeroValue(t *testing.T) {
 	opt := Of("")
 	require.False(t, opt.IsEmpty())
+	require.EqualValues(t, opt.value, "")
+	require.True(t, opt.hasValue)
 }
 
 func TestUnwrap_NotEmpty(t *testing.T) {
