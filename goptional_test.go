@@ -14,14 +14,15 @@ import (
 func TestEmpty(t *testing.T) {
 	opt := Empty[interface{}]()
 	require.NotNil(t, opt)
-	require.Nil(t, opt.wrapped)
+	require.False(t, opt.hasValue)
+	require.Empty(t, opt.value)
 }
 
 func TestOf_ValidValue(t *testing.T) {
 	opt := Of(123)
 	require.NotNil(t, opt)
-	require.NotNil(t, opt.wrapped)
-	require.EqualValues(t, opt.wrapped.value, 123)
+	require.True(t, opt.hasValue)
+	require.EqualValues(t, opt.value, 123)
 }
 
 func TestOf_InvalidValue(t *testing.T) {
@@ -37,6 +38,11 @@ func TestIsPresent_Empty(t *testing.T) {
 	require.False(t, opt.IsPresent())
 
 	opt = nil
+	require.False(t, opt.IsPresent())
+}
+
+func TestIsPresent_ZeroInst(t *testing.T) {
+	var opt Optional[string]
 	require.False(t, opt.IsPresent())
 }
 
@@ -65,6 +71,11 @@ func TestIsEmpty_Empty(t *testing.T) {
 
 func TestIsEmpty_NilValue(t *testing.T) {
 	opt := Of[map[string]interface{}](nil)
+	require.True(t, opt.IsEmpty())
+}
+
+func TestIsEmpty_ZeroInst(t *testing.T) {
+	var opt Optional[string]
 	require.True(t, opt.IsEmpty())
 }
 
@@ -639,7 +650,7 @@ func TestTake_NotEmpty(t *testing.T) {
 	opt := Of(123)
 	opt2 := opt.Take()
 
-	require.Nil(t, opt.wrapped)
+	require.False(t, opt.hasValue)
 	require.True(t, opt.IsEmpty())
 
 	require.True(t, opt2.IsPresent())
@@ -651,7 +662,7 @@ func TestTake_Ptr(t *testing.T) {
 	opt := Of(&v)
 	opt2 := opt.Take()
 
-	require.Nil(t, opt.wrapped)
+	require.False(t, opt.hasValue)
 	require.True(t, opt.IsEmpty())
 
 	require.True(t, opt2.IsPresent())
