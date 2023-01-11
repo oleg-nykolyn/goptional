@@ -12,11 +12,9 @@ import (
 // Optional represents an optional value.
 // At any time it can either hold a value or be empty.
 type Optional[T any] struct {
-	wrapped *valueWrapper[T]
-}
-
-type valueWrapper[T any] struct {
-	value T
+	// value is zero of T if hasValue == false
+	value    T
+	hasValue bool
 }
 
 // ErrNoValue is an error that is returned when attempting to retrieve a value from an empty Optional.
@@ -45,18 +43,18 @@ func Of[T any](value T) *Optional[T] {
 		}
 		fallthrough
 	default:
-		return &Optional[T]{&valueWrapper[T]{value: value}}
+		return &Optional[T]{value: value, hasValue: true}
 	}
 }
 
 // IsPresent returns true if this instance holds a value, and false otherwise.
 func (o *Optional[T]) IsPresent() bool {
-	return o != nil && o.wrapped != nil
+	return o != nil && o.hasValue
 }
 
 // IsEmpty returns true if this instance is empty, and false otherwise.
 func (o *Optional[T]) IsEmpty() bool {
-	return o == nil || o.wrapped == nil
+	return o == nil || !o.hasValue
 }
 
 // Unwrap returns the value held by this instance, if any, or _panics_ otherwise.
@@ -67,7 +65,7 @@ func (o *Optional[T]) Unwrap() T {
 		panic(ErrNoValue)
 	}
 
-	return o.wrapped.value
+	return o.value
 }
 
 // IfPresent applies the action to the value held by this instance.
@@ -221,8 +219,7 @@ func (o *Optional[T]) Xor(o2 *Optional[T]) *Optional[T] {
 // OrDefault returns the value held by this instance, if any, or the zero value of T otherwise.
 func (o *Optional[T]) OrDefault() T {
 	if o.IsEmpty() {
-		var zero T
-		return zero
+		return o.value
 	}
 
 	return o.Unwrap()
@@ -246,8 +243,7 @@ func (o *Optional[T]) OrElseGet(supplier func() T) T {
 	}
 
 	if supplier == nil {
-		var zero T
-		return zero
+		return o.value
 	}
 
 	return supplier()
@@ -305,7 +301,7 @@ func (o *Optional[T]) UnmarshalJSON(data []byte) error {
 	}
 
 	if len(data) == 0 || bytes.Equal(data, nilAsJSON) {
-		o.wrapped = nil
+		o.unsetValue()
 		return nil
 	}
 
@@ -314,7 +310,7 @@ func (o *Optional[T]) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	o.wrapped = &valueWrapper[T]{value: value}
+	o.setValue(value)
 
 	return nil
 }
@@ -335,7 +331,7 @@ func (o *Optional[T]) Take() *Optional[T] {
 	}
 
 	v := o.Unwrap()
-	o.wrapped = nil
+	o.unsetValue()
 	return Of(v)
 }
 
@@ -347,13 +343,13 @@ func (o *Optional[T]) Replace(value T) (*Optional[T], error) {
 		return nil, ErrMutationOnNil
 	}
 
-	if o.wrapped == nil {
-		o.wrapped = &valueWrapper[T]{value: value}
+	if !o.hasValue {
+		o.setValue(value)
 		return Empty[T](), nil
 	}
 
 	v := o.Unwrap()
-	o.wrapped = &valueWrapper[T]{value: value}
+	o.setValue(value)
 	return Of(v), nil
 }
 
@@ -433,8 +429,7 @@ func (o *Optional[T]) Val() (T, error) {
 		return o.Unwrap(), nil
 	}
 
-	var zero T
-	return zero, ErrNoValue
+	return o.value, ErrNoValue
 }
 
 // ValOr returns the value held by this instance, if any. It returns the given error otherwise.
@@ -444,12 +439,11 @@ func (o *Optional[T]) ValOr(err error) (T, error) {
 		return o.Unwrap(), nil
 	}
 
-	var zero T
 	if err == nil {
-		return zero, ErrNoValue
+		return o.value, ErrNoValue
 	}
 
-	return zero, err
+	return o.value, err
 }
 
 // ValOrElse returns the value held by this instance, if any.
@@ -461,15 +455,24 @@ func (o *Optional[T]) ValOrElse(supplier func() error) (T, error) {
 		return o.Unwrap(), nil
 	}
 
-	var zero T
 	if supplier == nil {
-		return zero, ErrNoValue
+		return o.value, ErrNoValue
 	}
 
-	err := supplier()
-	if err == nil {
-		return zero, ErrNoValue
+	if err := supplier(); err != nil {
+		return o.value, err
+	} else {
+		return o.value, ErrNoValue
 	}
+}
 
-	return zero, err
+func (o *Optional[T]) unsetValue() {
+	var zero T
+	o.value = zero
+	o.hasValue = false
+}
+
+func (o *Optional[T]) setValue(value T) {
+	o.value = value
+	o.hasValue = true
 }
