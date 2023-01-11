@@ -66,6 +66,7 @@ func (o *Optional[T]) Unwrap() T {
 	if o.IsEmpty() {
 		panic(ErrNoValue)
 	}
+
 	return o.wrapped.value
 }
 
@@ -198,6 +199,7 @@ func (o *Optional[T]) Or(supplier func() *Optional[T]) *Optional[T] {
 	if o.IsPresent() || supplier == nil {
 		return o
 	}
+
 	return supplier()
 }
 
@@ -212,6 +214,7 @@ func (o *Optional[T]) Xor(o2 *Optional[T]) *Optional[T] {
 	if o.IsPresent() {
 		return o
 	}
+
 	return o2
 }
 
@@ -221,6 +224,7 @@ func (o *Optional[T]) OrDefault() T {
 		var zero T
 		return zero
 	}
+
 	return o.Unwrap()
 }
 
@@ -229,6 +233,7 @@ func (o *Optional[T]) OrElse(fallback T) T {
 	if o.IsPresent() {
 		return o.Unwrap()
 	}
+
 	return fallback
 }
 
@@ -244,6 +249,7 @@ func (o *Optional[T]) OrElseGet(supplier func() T) T {
 		var zero T
 		return zero
 	}
+
 	return supplier()
 }
 
@@ -262,6 +268,7 @@ func (o *Optional[T]) UnwrapOr(supplier func() error) T {
 			panic(ErrNoValue)
 		}
 	}
+
 	return o.Unwrap()
 }
 
@@ -276,6 +283,7 @@ func (o *Optional[T]) Equals(o2 *Optional[T]) bool {
 	if o.IsPresent() && o2.IsPresent() {
 		return reflect.DeepEqual(o.Unwrap(), o2.Unwrap())
 	}
+
 	return false
 }
 
@@ -286,6 +294,7 @@ func (o *Optional[T]) MarshalJSON() ([]byte, error) {
 	if o.IsEmpty() {
 		return nilAsJSON, nil
 	}
+
 	return json.Marshal(o.Unwrap())
 }
 
@@ -315,6 +324,7 @@ func (o *Optional[T]) String() string {
 	if o.IsEmpty() {
 		return "Optional.empty"
 	}
+
 	return spew.Sprintf("Optional[%#+v]", o.Unwrap())
 }
 
@@ -374,6 +384,7 @@ func Unzip[X, Y any](o *Optional[*Pair[*Optional[X], *Optional[Y]]]) (*Optional[
 		pair := o.Unwrap()
 		return pair.First, pair.Second
 	}
+
 	return Empty[X](), Empty[Y]()
 }
 
@@ -391,6 +402,7 @@ func ZipWith[X, Y, Z any](o1 *Optional[X], o2 *Optional[Y], mapper func(X, Y) Z)
 
 		return Of(mapper(o1.Unwrap(), o2.Unwrap()))
 	}
+
 	return Empty[Z]()
 }
 
@@ -399,6 +411,7 @@ func Flatten[T any](o *Optional[*Optional[T]]) *Optional[T] {
 	if o.IsPresent() {
 		return o.Unwrap()
 	}
+
 	return Empty[T]()
 }
 
@@ -435,6 +448,7 @@ func (o *Optional[T]) ValOr(err error) (T, error) {
 	if err == nil {
 		return zero, ErrNoValue
 	}
+
 	return zero, err
 }
 
