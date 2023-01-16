@@ -1016,3 +1016,36 @@ func TestGetZeroValue_Nil(t *testing.T) {
 	var opt *Optional[string]
 	require.EqualValues(t, opt.getZeroValue(), "")
 }
+
+func TestEqualsBy_BothEmpty(t *testing.T) {
+	require.True(t, Empty[string]().EqualsBy(Empty[string](), nil))
+	require.True(t, Empty[string]().EqualsBy(nil, nil))
+
+	o := Empty[string]()
+	require.True(t, o.EqualsBy(o, nil))
+}
+
+func TestEqualsBy_OneEmpty(t *testing.T) {
+	o1 := Empty[int]()
+	o2 := Of(123)
+	var o3 *Optional[int]
+
+	require.False(t, o1.EqualsBy(o2, nil))
+	require.False(t, o2.EqualsBy(o1, nil))
+	require.False(t, o2.EqualsBy(o3, nil))
+}
+
+func TestEqualsBy_BothPresentNilPredicate(t *testing.T) {
+	require.True(t, Of(123).EqualsBy(Of(123), nil))
+	require.False(t, Of(123).EqualsBy(Of(321), nil))
+
+	o := Of("gm")
+	require.True(t, o.EqualsBy(o, nil))
+}
+
+func TestEqualsBy_BothPresent(t *testing.T) {
+	norm := func(s string) string { return strings.TrimSpace(strings.ToLower(s)) }
+	pred := func(v1, v2 string) bool { return norm(v1) == norm(v2) }
+	require.True(t, Of(" aBc").EqualsBy(Of("ABC  "), pred))
+	require.False(t, Of(" aBcd").EqualsBy(Of("ABC  "), pred))
+}

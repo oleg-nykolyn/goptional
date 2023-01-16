@@ -51,7 +51,7 @@ fmt.Println(opt2.IsEmpty()) // true
 opt := goptional.Empty[string]()
 ```
 
-### Presence
+### Value Presence
 
 ```go
 opt := goptional.Of(123)
@@ -65,14 +65,30 @@ fmt.Println(opt.IsEmpty()) // false
 
 ### Equality
 
+`Equals`
+
 ```go
 opt := goptional.Of(123)
 opt2 := goptional.Of(321)
 
-// Compare opt & opt2 for equality.
+// Compare opt & opt2 for _deep_ equality.
 // Return true if both contain the same value, or if both are empty.
 // Otherwise, return false.
 fmt.Println(opt.Equals(opt2)) // false
+```
+
+`EqualsBy`
+
+```go
+opt := goptional.Of(123)
+opt2 := goptional.Of(321)
+
+// Compare opt & opt2 for equality through a custom predicate.
+// Return true if both are empty, or if the predicate applied to their values holds.
+// Otherwise, return false.
+predicate := func(v1, v2 int) bool { return v1 == v2 }
+areEqual := opt.EqualsBy(opt2, predicate)
+fmt.Println(areEqual) // false
 ```
 
 ### Value Retrieval
