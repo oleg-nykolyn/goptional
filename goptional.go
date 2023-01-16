@@ -268,7 +268,7 @@ func (o *Optional[T]) UnwrapOr(supplier func() error) T {
 	return o.Unwrap()
 }
 
-// Equals compares two Optionals for equality.
+// Equals compares two Optionals for deep equality.
 // It returns true if both Optionals contain the same value, or if both Optionals are empty.
 // Otherwise, it returns false.
 func (o *Optional[T]) Equals(o2 *Optional[T]) bool {
@@ -277,6 +277,27 @@ func (o *Optional[T]) Equals(o2 *Optional[T]) bool {
 	}
 
 	if o.IsPresent() && o2.IsPresent() {
+		return reflect.DeepEqual(o.Unwrap(), o2.Unwrap())
+	}
+
+	return false
+}
+
+// EqualsBy compares two Optionals for equality through a custom predicate.
+// It returns true if both Optionals are not empty and the given predicate applied to their values holds,
+// or if both Optionals are empty.
+// Otherwise, it returns false.
+//
+// If the given predicate is nil, it is substituted with reflect.DeepEqual
+func (o *Optional[T]) EqualsBy(o2 *Optional[T], predicate func(v1, v2 T) bool) bool {
+	if !o.IsPresent() && !o2.IsPresent() {
+		return true
+	}
+
+	if o.IsPresent() && o2.IsPresent() {
+		if predicate != nil {
+			return predicate(o.Unwrap(), o2.Unwrap())
+		}
 		return reflect.DeepEqual(o.Unwrap(), o2.Unwrap())
 	}
 
