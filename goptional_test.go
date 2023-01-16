@@ -1012,11 +1012,6 @@ func TestValOrElse_SuppliedNilOnEmpty(t *testing.T) {
 	require.ErrorIs(t, err, ErrNoValue)
 }
 
-func TestGetZeroValue_Nil(t *testing.T) {
-	var opt *Optional[string]
-	require.EqualValues(t, opt.getZeroValue(), "")
-}
-
 func TestEqualsBy_BothEmpty(t *testing.T) {
 	require.True(t, Empty[string]().EqualsBy(Empty[string](), nil))
 	require.True(t, Empty[string]().EqualsBy(nil, nil))
