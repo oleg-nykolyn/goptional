@@ -168,7 +168,7 @@ fmt.Println(opt.OrDefault()) // ""
 ```go
 opt := goptional.Empty[string]()
 
-// Provide a default value if opt is empty.
+// Return the value held by opt, if any, or the provided default.
 fmt.Println(opt.OrElse("lfg")) // lfg
 ```
 
@@ -177,7 +177,7 @@ fmt.Println(opt.OrElse("lfg")) // lfg
 ```go
 opt := goptional.Empty[string]()
 
-// Provide a default through a supplier if opt is empty.
+// Return the value held by opt, if any, or the default provided by the given supplier.
 v := opt.OrElseGet(func() string {
     return "gm"
 })
@@ -216,6 +216,7 @@ opt := goptional.Of(123)
 
 // Apply a predicate to the value of opt, if any.
 opt = opt.Filter(func(v int) bool { return v > 100 })
+
 // Return an empty Optional, as 123 is not even.
 opt = opt.Filter(func(v int) bool { return v%2 == 0 })
 
