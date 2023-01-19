@@ -6,10 +6,10 @@ A comprehensive implementation of the [`Optional`](https://en.wikipedia.org/wiki
 
 ## Features
 
-- Inspired by [Java](https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/util/Optional.java) & [Rust](https://doc.rust-lang.org/std/option/enum.Option.html)
-- Compatible with all *value* and *reference* types
+- API design inspired by the implementations in [Java](https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/util/Optional.java) & [Rust](https://doc.rust-lang.org/std/option/enum.Option.html)
+- Compatible with all **value** and **reference** types
 - Based on chainable and expressive [generic methods and functions](https://go.dev/doc/tutorial/generics)
-- Null safe *by design*
+- Null safe **by design**
 
 ## Installation
 
