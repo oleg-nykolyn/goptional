@@ -98,7 +98,7 @@ fmt.Println(areEqual) // false
 ```go
 opt := goptional.Of(123)
 
-// Return the value from opt, if any, or a NoValErr otherwise.
+// Return the value from opt, if any, or an ErrNoValue otherwise.
 v, err := opt.Val()
 
 fmt.Println(v)   // 123
