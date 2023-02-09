@@ -17,10 +17,10 @@ type Optional[T any] struct {
 	hasValue bool
 }
 
-// ErrNoValue is an error that is returned when attempting to retrieve a value from an empty Optional.
+// ErrNoValue is returned when attempting to retrieve a value from an empty Optional.
 var ErrNoValue = errors.New("no value present")
 
-// ErrMutationOnNil is an error that is returned when attempting to mutate a nil Optional instance.
+// ErrMutationOnNil is returned when attempting to mutate a nil Optional instance.
 var ErrMutationOnNil = errors.New("cannot mutate nil Optional instance")
 
 // Empty returns a new empty Optional.
