@@ -859,54 +859,54 @@ func TestZip_BothNotEmpty(t *testing.T) {
 }
 
 func TestUnzip_Empty(t *testing.T) {
-	o1, o2 := Unzip(Empty[*Pair[*Optional[int], *Optional[string]]]())
-	require.True(t, o1.IsEmpty())
-	require.True(t, o2.IsEmpty())
+	opt1, opt2 := Unzip(Empty[*Pair[*Optional[int], *Optional[string]]]())
+	require.True(t, opt1.IsEmpty())
+	require.True(t, opt2.IsEmpty())
 }
 
 func TestUnzip_BothNotEmpty(t *testing.T) {
 	pair := &Pair[*Optional[int], *Optional[string]]{First: Of(123), Second: Of("gm")}
-	o1, o2 := Unzip(Of(pair))
+	opt1, opt2 := Unzip(Of(pair))
 
-	require.True(t, o1.IsPresent())
-	require.EqualValues(t, o1, pair.First)
+	require.True(t, opt1.IsPresent())
+	require.EqualValues(t, opt1, pair.First)
 
-	require.True(t, o2.IsPresent())
-	require.EqualValues(t, o2, pair.Second)
+	require.True(t, opt2.IsPresent())
+	require.EqualValues(t, opt2, pair.Second)
 
 }
 
 func TestUnzip_LeftEmpty(t *testing.T) {
 	pair := &Pair[*Optional[int], *Optional[string]]{First: Empty[int](), Second: Of("gm")}
-	o1, o2 := Unzip(Of(pair))
+	opt1, opt2 := Unzip(Of(pair))
 
-	require.True(t, o1.IsEmpty())
-	require.EqualValues(t, o1, pair.First)
+	require.True(t, opt1.IsEmpty())
+	require.EqualValues(t, opt1, pair.First)
 
-	require.True(t, o2.IsPresent())
-	require.EqualValues(t, o2, pair.Second)
+	require.True(t, opt2.IsPresent())
+	require.EqualValues(t, opt2, pair.Second)
 }
 
 func TestUnzip_RightEmpty(t *testing.T) {
 	pair := &Pair[*Optional[int], *Optional[string]]{First: Of(123), Second: Empty[string]()}
-	o1, o2 := Unzip(Of(pair))
+	opt1, opt2 := Unzip(Of(pair))
 
-	require.True(t, o1.IsPresent())
-	require.EqualValues(t, o1, pair.First)
+	require.True(t, opt1.IsPresent())
+	require.EqualValues(t, opt1, pair.First)
 
-	require.True(t, o2.IsEmpty())
-	require.EqualValues(t, o2, pair.Second)
+	require.True(t, opt2.IsEmpty())
+	require.EqualValues(t, opt2, pair.Second)
 }
 
 func TestUnzip_BothEmpty(t *testing.T) {
 	pair := &Pair[*Optional[int], *Optional[string]]{First: Empty[int](), Second: Empty[string]()}
-	o1, o2 := Unzip(Of(pair))
+	opt1, opt2 := Unzip(Of(pair))
 
-	require.True(t, o1.IsEmpty())
-	require.EqualValues(t, o1, pair.First)
+	require.True(t, opt1.IsEmpty())
+	require.EqualValues(t, opt1, pair.First)
 
-	require.True(t, o2.IsEmpty())
-	require.EqualValues(t, o2, pair.Second)
+	require.True(t, opt2.IsEmpty())
+	require.EqualValues(t, opt2, pair.Second)
 }
 
 func TestZipWith_SomeEmpty(t *testing.T) {
@@ -1016,26 +1016,26 @@ func TestEqualsBy_BothEmpty(t *testing.T) {
 	require.True(t, Empty[string]().EqualsBy(Empty[string](), nil))
 	require.True(t, Empty[string]().EqualsBy(nil, nil))
 
-	o := Empty[string]()
-	require.True(t, o.EqualsBy(o, nil))
+	opt := Empty[string]()
+	require.True(t, opt.EqualsBy(opt, nil))
 }
 
 func TestEqualsBy_OneEmpty(t *testing.T) {
-	o1 := Empty[int]()
-	o2 := Of(123)
-	var o3 *Optional[int]
+	opt1 := Empty[int]()
+	opt2 := Of(123)
+	var opt3 *Optional[int]
 
-	require.False(t, o1.EqualsBy(o2, nil))
-	require.False(t, o2.EqualsBy(o1, nil))
-	require.False(t, o2.EqualsBy(o3, nil))
+	require.False(t, opt1.EqualsBy(opt2, nil))
+	require.False(t, opt2.EqualsBy(opt1, nil))
+	require.False(t, opt2.EqualsBy(opt3, nil))
 }
 
 func TestEqualsBy_BothPresentNilPredicate(t *testing.T) {
 	require.True(t, Of(123).EqualsBy(Of(123), nil))
 	require.False(t, Of(123).EqualsBy(Of(321), nil))
 
-	o := Of("gm")
-	require.True(t, o.EqualsBy(o, nil))
+	opt := Of("gm")
+	require.True(t, opt.EqualsBy(opt, nil))
 }
 
 func TestEqualsBy_BothPresent(t *testing.T) {
