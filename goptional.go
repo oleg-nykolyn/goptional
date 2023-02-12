@@ -12,9 +12,8 @@ import (
 // Optional represents an optional value.
 // At any time it can either hold a value or be empty.
 type Optional[T any] struct {
-	// value is zero of T if hasValue == false
-	value    T
-	hasValue bool
+	value           T
+	isValidValueSet bool // Is true if value is valid and not nil.
 }
 
 // ErrNoValue is returned when attempting to retrieve a value from an empty Optional.
@@ -31,6 +30,12 @@ func Empty[T any]() *Optional[T] {
 // Of returns a new Optional that holds the given value.
 // It returns an empty Optional if the value is either invalid or nil.
 func Of[T any](value T) *Optional[T] {
+	// There are two possible implementation choices here: reflection and a Nillable interface.
+	// Reflection is used to avoid the hassle of forcing
+	// the caller to implement Nillable on all types.
+	// The third _undesirable_ option would be to skip the IsNil check and
+	// trust the caller: needless to say, this could inevitably lead to very unpredictable API results.
+
 	v := reflect.ValueOf(value)
 	if !v.IsValid() {
 		return Empty[T]()
@@ -43,18 +48,18 @@ func Of[T any](value T) *Optional[T] {
 		}
 		fallthrough
 	default:
-		return &Optional[T]{value: value, hasValue: true}
+		return &Optional[T]{value: value, isValidValueSet: true}
 	}
 }
 
 // IsPresent returns true if this instance holds a value, and false otherwise.
 func (o *Optional[T]) IsPresent() bool {
-	return o != nil && o.hasValue
+	return o != nil && o.isValidValueSet
 }
 
 // IsEmpty returns true if this instance is empty, and false otherwise.
 func (o *Optional[T]) IsEmpty() bool {
-	return o == nil || !o.hasValue
+	return o == nil || !o.isValidValueSet
 }
 
 // Unwrap returns the value held by this instance, if any, or _panics_ otherwise.
@@ -363,7 +368,7 @@ func (o *Optional[T]) Replace(value T) (*Optional[T], error) {
 		return nil, ErrMutationOnNil
 	}
 
-	if !o.hasValue {
+	if !o.isValidValueSet {
 		o.setValue(value)
 		return Empty[T](), nil
 	}
@@ -488,12 +493,12 @@ func (o *Optional[T]) ValOrElse(supplier func() error) (T, error) {
 
 func (o *Optional[T]) unsetValue() {
 	o.value = getZeroOfType[T]()
-	o.hasValue = false
+	o.isValidValueSet = false
 }
 
 func (o *Optional[T]) setValue(value T) {
 	o.value = value
-	o.hasValue = true
+	o.isValidValueSet = true
 }
 
 func getZeroOfType[T any]() T {
