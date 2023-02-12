@@ -32,9 +32,25 @@ func TestOf_InvalidValue(t *testing.T) {
 }
 
 func TestOf_NilValue(t *testing.T) {
-	opt := Of[*string](nil)
-	require.Empty(t, opt.value)
-	require.False(t, opt.isValueValid)
+	optPtr := Of[*string](nil)
+	require.Nil(t, optPtr.value)
+	require.False(t, optPtr.isValueValid)
+
+	optSlice := Of[[]string](nil)
+	require.Nil(t, optSlice.value)
+	require.False(t, optSlice.isValueValid)
+
+	optMap := Of[map[string]interface{}](nil)
+	require.Nil(t, optMap.value)
+	require.False(t, optMap.isValueValid)
+
+	optChan := Of[<-chan struct{}](nil)
+	require.Nil(t, optChan.value)
+	require.False(t, optChan.isValueValid)
+
+	optFunc := Of[func(string) interface{}](nil)
+	require.Nil(t, optFunc.value)
+	require.False(t, optFunc.isValueValid)
 }
 
 func TestIsPresent_Empty(t *testing.T) {
