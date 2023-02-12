@@ -12,8 +12,8 @@ import (
 // Optional represents an optional value.
 // At any time it can either hold a value or be empty.
 type Optional[T any] struct {
-	value           T
-	isValidValueSet bool // Is true if value is valid and not nil.
+	value        T
+	isValueValid bool
 }
 
 // ErrNoValue is returned when attempting to retrieve a value from an empty Optional.
@@ -28,7 +28,7 @@ func Empty[T any]() *Optional[T] {
 }
 
 // Of returns a new Optional that holds the given value.
-// It returns an empty Optional if the value is either invalid or nil.
+// It returns an empty Optional if such value is either invalid or nil.
 func Of[T any](value T) *Optional[T] {
 	// There are two possible implementation choices here: reflection and a Nillable interface.
 	// Reflection is used to avoid the hassle of forcing
@@ -48,18 +48,18 @@ func Of[T any](value T) *Optional[T] {
 		}
 		fallthrough
 	default:
-		return &Optional[T]{value: value, isValidValueSet: true}
+		return &Optional[T]{value: value, isValueValid: true}
 	}
 }
 
 // IsPresent returns true if this instance holds a value, and false otherwise.
 func (o *Optional[T]) IsPresent() bool {
-	return o != nil && o.isValidValueSet
+	return o != nil && o.isValueValid
 }
 
 // IsEmpty returns true if this instance is empty, and false otherwise.
 func (o *Optional[T]) IsEmpty() bool {
-	return o == nil || !o.isValidValueSet
+	return o == nil || !o.isValueValid
 }
 
 // Unwrap returns the value held by this instance, if any, or _panics_ otherwise.
@@ -368,7 +368,7 @@ func (o *Optional[T]) Replace(value T) (*Optional[T], error) {
 		return nil, ErrMutationOnNil
 	}
 
-	if !o.isValidValueSet {
+	if !o.isValueValid {
 		o.setValue(value)
 		return Empty[T](), nil
 	}
@@ -493,12 +493,12 @@ func (o *Optional[T]) ValOrElse(supplier func() error) (T, error) {
 
 func (o *Optional[T]) unsetValue() {
 	o.value = getZeroOfType[T]()
-	o.isValidValueSet = false
+	o.isValueValid = false
 }
 
 func (o *Optional[T]) setValue(value T) {
 	o.value = value
-	o.isValidValueSet = true
+	o.isValueValid = true
 }
 
 func getZeroOfType[T any]() T {
