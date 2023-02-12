@@ -573,7 +573,7 @@ Refer to the [contribution guide](CONTRIBUTING.md) and the [code of conduct](COD
 
 ---
 
-Released under the [MIT license](LICENSE.txt).
+Released under the [MIT license](LICENSE.txt)
 
 [doc-img]: https://pkg.go.dev/badge/github.com/nykolynoleg/goptional
 [doc]: https://pkg.go.dev/github.com/nykolynoleg/goptional
