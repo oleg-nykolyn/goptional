@@ -27,14 +27,15 @@ func Empty[T any]() *Optional[T] {
 	return &Optional[T]{}
 }
 
-// Of returns a new Optional that holds the given value.
-// It returns an empty Optional if such value is either invalid or nil.
+// Of attempts to return a new non-empty Optional wrapping the given value.
+// If such value is either invalid or nil, it returns an empty Optional instead.
 func Of[T any](value T) *Optional[T] {
-	// There are two possible implementation choices here: reflection and a Nillable interface.
-	// Reflection is used to avoid the hassle of forcing
-	// the caller to implement Nillable on all types.
+	// There are two sensible implementation options here: reflection and a Nillable interface.
 	// The third _undesirable_ option would be to skip the IsNil check and
 	// trust the caller: needless to say, this could inevitably lead to very unpredictable API results.
+	//
+	// _Of_ adopts reflection to avoid the hassle of forcing
+	// the caller to implement Nillable on all types.
 
 	v := reflect.ValueOf(value)
 	if !v.IsValid() {
@@ -57,14 +58,15 @@ func (o *Optional[T]) IsPresent() bool {
 	return o != nil && o.isValueValid
 }
 
-// IsEmpty returns true if this instance is empty, and false otherwise.
+// IsEmpty returns true if this instance does not hold a value, and false otherwise.
 func (o *Optional[T]) IsEmpty() bool {
 	return o == nil || !o.isValueValid
 }
 
 // Unwrap returns the value held by this instance, if any, or _panics_ otherwise.
 //
-// Use it only if you know what you are doing. Usage of OrDefault / OrElse is preferred.
+// Use it only if you _know_ what you are doing.
+// Usage of OrDefault / OrElse is preferred.
 func (o *Optional[T]) Unwrap() T {
 	if o.IsEmpty() {
 		panic(ErrNoValue)
