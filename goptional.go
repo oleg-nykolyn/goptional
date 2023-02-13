@@ -30,27 +30,18 @@ func Empty[T any]() *Optional[T] {
 // Of attempts to return a new non-empty Optional wrapping the given value.
 // If such value is either invalid or nil, it returns an empty Optional instead.
 func Of[T any](value T) *Optional[T] {
-	// There are two sensible implementation options here: reflection and a Nillable interface.
-	// The third _undesirable_ option would be to skip the IsNil check and
+	// There are two sensible implementation choices here: reflection and a Nillable interface.
+	// The third _undesirable_ choice would be to skip the IsNil check and
 	// trust the caller: needless to say, this could inevitably lead to very unpredictable API results.
 	//
-	// _Of_ adopts reflection to avoid the hassle of forcing
+	// goptional adopts reflection to avoid the hassle of forcing
 	// the caller to implement Nillable on all types.
 
-	v := reflect.ValueOf(value)
-	if !v.IsValid() {
-		return Empty[T]()
-	}
-
-	switch v.Kind() {
-	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
-		if v.IsNil() {
-			return Empty[T]()
-		}
-		fallthrough
-	default:
+	if isValueValid(value) {
 		return &Optional[T]{value: value, isValueValid: true}
 	}
+
+	return Empty[T]()
 }
 
 // IsPresent returns true if this instance holds a value, and false otherwise.
@@ -221,7 +212,8 @@ func (o *Optional[T]) Xor(o2 *Optional[T]) *Optional[T] {
 	return o2
 }
 
-// OrDefault returns the value held by this instance, if any, or the zero value of T otherwise.
+// OrDefault returns the value held by this instance, if any, or the zero value of T otherwise e.g.
+// string -> "", bool -> false, int -> 0, ptr -> nil, etc.
 func (o *Optional[T]) OrDefault() T {
 	if o.IsEmpty() {
 		return getZeroOfType[T]()
@@ -488,19 +480,53 @@ func (o *Optional[T]) ValOrElse(supplier func() error) (T, error) {
 
 	if err := supplier(); err != nil {
 		return getZeroOfType[T](), err
+	}
+	return getZeroOfType[T](), ErrNoValue
+}
+
+// unsetValue changes the state of this instance to non-empty
+// iff the given value is valid, or to empty otherwise.
+func (o *Optional[T]) setValue(value T) {
+	if o == nil {
+		// should never happen, by design.
+		return
+	}
+
+	if isValueValid(value) {
+		o.value = value
+		o.isValueValid = true
 	} else {
-		return getZeroOfType[T](), ErrNoValue
+		o.unsetValue()
 	}
 }
 
+// unsetValue changes the state of this instance to empty.
 func (o *Optional[T]) unsetValue() {
+	if o == nil {
+		// should never happen, by design.
+		return
+	}
+
 	o.value = getZeroOfType[T]()
 	o.isValueValid = false
 }
 
-func (o *Optional[T]) setValue(value T) {
-	o.value = value
-	o.isValueValid = true
+// isValueValid returns false if the given value is either nil or invalid.
+func isValueValid[T any](value T) bool {
+	v := reflect.ValueOf(value)
+	if !v.IsValid() {
+		return false
+	}
+
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
+		if v.IsNil() {
+			return false
+		}
+		fallthrough
+	default:
+		return true
+	}
 }
 
 func getZeroOfType[T any]() T {
