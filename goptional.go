@@ -484,7 +484,7 @@ func (o *Optional[T]) ValOrElse(supplier func() error) (T, error) {
 	return getZeroOfType[T](), ErrNoValue
 }
 
-// unsetValue changes the state of this instance to non-empty
+// setValue changes the state of this instance to non-empty
 // iff the given value is valid, or to empty otherwise.
 func (o *Optional[T]) setValue(value T) {
 	if o == nil {
