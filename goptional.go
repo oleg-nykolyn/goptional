@@ -89,7 +89,7 @@ func (o *Optional[T]) IfPresentOrElse(action func(T), emptyAction func()) {
 }
 
 // Filter returns this instance if it is empty or
-// if the predicate applied to its value returns false.
+// if the predicate applied to its value holds.
 // If this instance is not empty and predicate is nil, it returns an empty Optional.
 func (o *Optional[T]) Filter(predicate func(T) bool) *Optional[T] {
 	if o.IsEmpty() {
@@ -222,7 +222,7 @@ func (o *Optional[T]) OrDefault() T {
 	return o.Unwrap()
 }
 
-// OrElse returns the value held by this instance, if any, or the given value otherwise.
+// OrElse returns the value held by this instance, if any, or the given fallback value otherwise.
 func (o *Optional[T]) OrElse(fallback T) T {
 	if o.IsPresent() {
 		return o.Unwrap()
@@ -281,11 +281,11 @@ func (o *Optional[T]) Equals(o2 *Optional[T]) bool {
 }
 
 // EqualsBy compares two Optionals for equality through a custom predicate.
-// It returns true if both Optionals are not empty and the given predicate applied to their values holds,
+// It returns true if both Optionals are not empty and the predicate applied to their values holds,
 // or if both Optionals are empty.
 // It returns false otherwise.
 //
-// If the given predicate is nil, it is substituted with reflect.DeepEqual
+// Note that a nil predicate is replaced by reflect.DeepEqual
 func (o *Optional[T]) EqualsBy(o2 *Optional[T], predicate func(v1, v2 T) bool) bool {
 	if !o.IsPresent() && !o2.IsPresent() {
 		return true
@@ -312,7 +312,7 @@ func (o *Optional[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(o.Unwrap())
 }
 
-// UnmarshalJSON attempts to populate this instance with the given JSON data.
+// UnmarshalJSON populates this instance with the given JSON data.
 func (o *Optional[T]) UnmarshalJSON(data []byte) error {
 	if o == nil {
 		return ErrMutationOnNil
@@ -430,7 +430,7 @@ func Flatten[T any](o *Optional[*Optional[T]]) *Optional[T] {
 	return Empty[T]()
 }
 
-// Is checks if the value of this instance satisfies the given predicate.
+// Is checks whether the value of this instance satisfies the given predicate.
 // If this instance is empty, it returns false.
 //
 // If this instance is not empty and predicate is nil, it returns false.
