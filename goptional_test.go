@@ -753,6 +753,17 @@ func TestReplace_NotEmpty(t *testing.T) {
 	require.EqualValues(t, opt2.Unwrap(), meh)
 }
 
+func TestReplace_NilValueOnNotEmpty(t *testing.T) {
+	s := "gm"
+	o := Of(&s)
+
+	o2, err := o.Replace(nil)
+
+	require.NoError(t, err)
+	require.True(t, o.IsEmpty())
+	require.EqualValues(t, o2.Unwrap(), &s)
+}
+
 type sampleStruct struct {
 	X string   `json:"x"`
 	Y bool     `json:"y"`
@@ -1059,4 +1070,34 @@ func TestEqualsBy_BothPresent(t *testing.T) {
 	pred := func(v1, v2 string) bool { return norm(v1) == norm(v2) }
 	require.True(t, Of(" aBc").EqualsBy(Of("ABC  "), pred))
 	require.False(t, Of(" aBcd").EqualsBy(Of("ABC  "), pred))
+}
+
+func TestPrivSetValue(t *testing.T) {
+	s := "gm"
+	o := Of(&s)
+
+	o.setValue(nil)
+	require.True(t, o.IsEmpty())
+
+	o.setValue(&s)
+	require.True(t, o.IsPresent())
+	require.EqualValues(t, o.Unwrap(), &s)
+
+	o = nil
+	o.setValue(nil)
+	require.True(t, o.IsEmpty())
+}
+
+func TestPrivUnsetValue(t *testing.T) {
+	o := Of("gm")
+	o.unsetValue()
+	require.True(t, o.IsEmpty())
+
+	o = Empty[string]()
+	o.unsetValue()
+	require.True(t, o.IsEmpty())
+
+	o = nil
+	o.unsetValue()
+	require.True(t, o.IsEmpty())
 }
