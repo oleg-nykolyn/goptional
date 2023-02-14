@@ -16,11 +16,11 @@ type Optional[T any] struct {
 	isValueValid bool
 }
 
-// ErrNoValue is returned when attempting to retrieve a value from an empty Optional.
+// ErrNoValue indicates that the Optional instance is empty and its value cannot be retrieved.
 var ErrNoValue = errors.New("no value present")
 
-// ErrMutationOnNil is returned when attempting to mutate a nil Optional instance.
-var ErrMutationOnNil = errors.New("cannot mutate nil Optional instance")
+// ErrMutationOnNil indicates that the Optional instance is nil and cannot be mutated.
+var ErrMutationOnNil = errors.New("cannot mutate nil instance")
 
 // Empty returns a new empty Optional.
 func Empty[T any]() *Optional[T] {
@@ -488,7 +488,7 @@ func (o *Optional[T]) ValOrElse(supplier func() error) (T, error) {
 // iff the given value is valid, or to empty otherwise.
 func (o *Optional[T]) setValue(value T) {
 	if o == nil {
-		// should never happen, by design.
+		// Should never happen, by design.
 		return
 	}
 
@@ -503,7 +503,7 @@ func (o *Optional[T]) setValue(value T) {
 // unsetValue changes the state of this instance to empty.
 func (o *Optional[T]) unsetValue() {
 	if o == nil {
-		// should never happen, by design.
+		// Should never happen, by design.
 		return
 	}
 
