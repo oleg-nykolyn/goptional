@@ -6,7 +6,7 @@ We welcome contributions to **goptional**. Whether it's a bug report, new featur
 
 ### Reporting Bugs
 
-To report a bug, please create an issue in the [GitHub issue tracker](https://github.com/nykolynoleg/goptional/issues) and include as much information as possible about the issue, including:
+To report a bug, please create an issue in the [GitHub issue tracker](https://github.com/oleg-nykolyn/goptional/issues) and include as much information as possible about the issue, including:
 
 * The version of the project you are using
 * Any error messages you are receiving
@@ -16,7 +16,7 @@ It's also helpful if you can include a code sample that reproduces the issue.
 
 ### Requesting Features
 
-To request a new feature, please create an issue in the [GitHub issue tracker](https://github.com/nykolynoleg/goptional/issues). If possible, please include details about why you think the feature would be useful, and any ideas you have for how it could be implemented.
+To request a new feature, please create an issue in the [GitHub issue tracker](https://github.com/oleg-nykolyn/goptional/issues). If possible, please include details about why you think the feature would be useful, and any ideas you have for how it could be implemented.
 
 ### Contributing Code
 

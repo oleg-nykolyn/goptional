@@ -1,4 +1,4 @@
-module github.com/nykolynoleg/goptional
+module github.com/oleg-nykolyn/goptional
 
 go 1.19
 
