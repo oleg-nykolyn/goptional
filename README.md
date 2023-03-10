@@ -16,16 +16,16 @@ A comprehensive implementation of the [`Optional`](https://en.wikipedia.org/wiki
 > ❗️ *goptional* requires **go 1.19**
 
 ```bash
-go get -u github.com/nykolynoleg/goptional
+go get -u github.com/oleg-nykolyn/goptional
 ```
 
 ## Usage
 
-> 👨🏻‍💻 Refer to the [documentation](https://pkg.go.dev/github.com/nykolynoleg/goptional) for a complete reference.
+> 👨🏻‍💻 Refer to the [documentation](https://pkg.go.dev/github.com/oleg-nykolyn/goptional) for a complete reference.
 
 ```go
 // Import goptional into your code and refer to it as `goptional`.
-import "github.com/nykolynoleg/goptional"
+import "github.com/oleg-nykolyn/goptional"
 ```
 
 ### Creation
@@ -575,11 +575,11 @@ Refer to the [contribution guide](CONTRIBUTING.md) and the [code of conduct](COD
 
 Released under the [MIT license](LICENSE.txt)
 
-[doc-img]: https://pkg.go.dev/badge/github.com/nykolynoleg/goptional
-[doc]: https://pkg.go.dev/github.com/nykolynoleg/goptional
-[ci-img]: https://github.com/nykolynoleg/goptional/actions/workflows/go.yml/badge.svg
-[ci]: https://github.com/nykolynoleg/goptional/actions/workflows/go.yml
-[cov-img]: https://codecov.io/gh/nykolynoleg/goptional/branch/master/graph/badge.svg
-[cov]: https://codecov.io/gh/nykolynoleg/goptional
-[rep-img]: https://goreportcard.com/badge/github.com/nykolynoleg/goptional
-[rep]: https://goreportcard.com/report/github.com/nykolynoleg/goptional
+[doc-img]: https://pkg.go.dev/badge/github.com/oleg-nykolyn/goptional
+[doc]: https://pkg.go.dev/github.com/oleg-nykolyn/goptional
+[ci-img]: https://github.com/oleg-nykolyn/goptional/actions/workflows/go.yml/badge.svg
+[ci]: https://github.com/oleg-nykolyn/goptional/actions/workflows/go.yml
+[cov-img]: https://codecov.io/gh/oleg-nykolyn/goptional/branch/master/graph/badge.svg
+[cov]: https://codecov.io/gh/oleg-nykolyn/goptional
+[rep-img]: https://goreportcard.com/badge/github.com/oleg-nykolyn/goptional
+[rep]: https://goreportcard.com/report/github.com/oleg-nykolyn/goptional
