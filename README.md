@@ -311,7 +311,6 @@ fmt.Println(strOpt.OrDefault()) // ""
 opt := goptional.Of(goptional.Of(123))
 
 // Flatten opt by returning the wrapped Optional, if any.
-// Transform Optional[Optional[T]] into Optional[T].
 fOpt := goptional.Flatten(opt)
 
 fmt.Println(fOpt.Unwrap()) // 123
